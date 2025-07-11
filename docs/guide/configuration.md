@@ -271,4 +271,4 @@ Configuration validation failed: Log level must be one of: debug, info, warn, er
 
 - [Platform Setup](/guide/platforms/devto) - Configure specific platforms
 - [SDK Usage](/guide/usage/sdk) - Use configuration in your code
-- [CLI Usage](/guide/usage/cli) - CLI configuration options
+- [CLI Usage](/guide/cli) - CLI configuration options

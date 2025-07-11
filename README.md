@@ -361,8 +361,8 @@ MIT
 ## Support
 
 For issues and questions:
-- GitHub Issues: [Create an issue](https://github.com/your-username/auto-crosspost/issues)
-- Documentation: [Full documentation](https://github.com/your-username/auto-crosspost/wiki)
+- GitHub Issues: [Create an issue](https://github.com/rohittcodes/auto-crosspost/issues)
+- Documentation: [Full documentation](https://github.com/rohittcodes/auto-crosspost/wiki)
 
 ---
 

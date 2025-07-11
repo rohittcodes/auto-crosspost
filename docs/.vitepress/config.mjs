@@ -3,6 +3,21 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Auto-CrossPost SDK',
   description: 'Automatically cross-post your blog content to multiple platforms',
+  base: '/auto-crosspost/', // GitHub Pages base path
+
+  head: [
+    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['meta', { name: 'theme-color', content: '#3c82f6' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:locale', content: 'en' }],
+    ['meta', { property: 'og:title', content: 'Auto-CrossPost SDK | Automated Blog Cross-Posting' }],
+    ['meta', { property: 'og:site_name', content: 'Auto-CrossPost SDK' }],
+    ['meta', { property: 'og:url', content: 'https://auto-crosspost.dev/' }],
+    ['meta', { property: 'og:description', content: 'Automatically cross-post your blog content to multiple platforms' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'Auto-CrossPost SDK' }],
+    ['meta', { name: 'twitter:description', content: 'Automatically cross-post your blog content to multiple platforms' }]
+  ],
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
@@ -91,16 +106,6 @@ export default defineConfig({
       provider: 'local'
     }
   },
-
-  head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
-    ['meta', { name: 'theme-color', content: '#3c82f6' }],
-    ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:locale', content: 'en' }],
-    ['meta', { property: 'og:title', content: 'Auto-CrossPost SDK | Automated Blog Cross-Posting' }],
-    ['meta', { property: 'og:site_name', content: 'Auto-CrossPost SDK' }],
-    ['meta', { property: 'og:url', content: 'https://auto-crosspost.dev/' }],
-  ],
 
   sitemap: {
     hostname: 'https://auto-crosspost.dev'

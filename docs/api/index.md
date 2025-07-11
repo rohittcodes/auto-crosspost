@@ -468,6 +468,6 @@ const results = await sdk.postToAll(post)
 
 ## Next Steps
 
-- [Platform Guides](/guide/platforms/) - Platform-specific documentation
+- [Platform Guides](/guide/platforms/devto) - Platform-specific documentation
 - [Examples](/examples/) - Complete usage examples
-- [CLI Reference](/guide/cli/) - Command-line interface documentation
+- [CLI Reference](/guide/cli) - Command-line interface documentation

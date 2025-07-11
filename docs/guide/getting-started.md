@@ -130,7 +130,7 @@ After running the cross-post:
 ### Next Steps:
 - [Configuration Guide](/guide/configuration) - Learn about all configuration options
 - [Platform Setup](/guide/platforms/devto) - Detailed platform configuration
-- [CLI Usage](/guide/usage/cli) - Explore all CLI commands
+- [CLI Usage](/guide/cli) - Explore all CLI commands
 - [SDK Usage](/guide/usage/sdk) - Advanced SDK usage patterns
 
 ### Common Next Actions:
