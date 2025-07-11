@@ -1,0 +1,320 @@
+name: Auto CrossPost - With Notifications
+
+# This workflow includes comprehensive notification support
+# for Slack, Discord, and email notifications
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'posts/**/*.md'
+      - 'content/**/*.md'
+      - 'blog/**/*.md'
+
+jobs:
+  crosspost-with-notifications:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install -g auto-crosspost
+          npm install gray-matter
+
+      - name: Create configuration file
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          HASHNODE_ACCESS_TOKEN: ${{ secrets.HASHNODE_ACCESS_TOKEN }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+        run: |
+          cat > crosspost.config.json << EOF
+          {
+            "platforms": {
+              "devto": {
+                "apiKey": "$DEVTO_API_KEY"
+              },
+              "hashnode": {
+                "accessToken": "$HASHNODE_ACCESS_TOKEN",
+                "publicationId": "$HASHNODE_PUBLICATION_ID"
+              }
+            },
+            "defaults": {
+              "publishStatus": "published"
+            },
+            "logging": {
+              "level": "info"
+            }
+          }
+          EOF
+
+      - name: Get changed files and extract metadata
+        id: analyze
+        run: |
+          # Get changed files
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- '*.md' '**/*.md')
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No markdown files changed"
+            echo "files_count=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Create metadata extraction script
+          cat > extract-metadata.js << 'EOF'
+          const fs = require('fs');
+          const matter = require('gray-matter');
+
+          const files = process.argv.slice(2);
+          const metadata = [];
+
+          files.forEach(file => {
+            if (fs.existsSync(file)) {
+              try {
+                const content = fs.readFileSync(file, 'utf8');
+                const { data } = matter(content);
+                metadata.push({
+                  file,
+                  title: data.title || 'Untitled',
+                  description: data.description || '',
+                  tags: data.tags || [],
+                  crosspost: data.crosspost !== false
+                });
+              } catch (error) {
+                console.error(`Error reading ${file}:`, error.message);
+              }
+            }
+          });
+
+          console.log(JSON.stringify(metadata, null, 2));
+          EOF
+
+          # Extract metadata
+          METADATA=$(echo "$CHANGED_FILES" | tr '\n' ' ' | xargs node extract-metadata.js)
+
+          # Count files
+          FILES_COUNT=$(echo "$CHANGED_FILES" | wc -l)
+
+          # Save outputs
+          echo "files_count=$FILES_COUNT" >> $GITHUB_OUTPUT
+          echo "metadata<<EOF" >> $GITHUB_OUTPUT
+          echo "$METADATA" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Cross-post files
+        id: crosspost
+        if: steps.analyze.outputs.files_count > 0
+        run: |
+          SUCCESS_COUNT=0
+          FAILED_COUNT=0
+          SKIPPED_COUNT=0
+          RESULTS=""
+
+          echo "${{ steps.analyze.outputs.changed_files }}" | while read file; do
+            if [ -f "$file" ]; then
+              echo "📝 Processing: $file"
+
+              if crosspost post "$file" --config crosspost.config.json; then
+                echo "✅ Success: $file"
+                SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+                RESULTS="$RESULTS✅ $file\n"
+              else
+                echo "❌ Failed: $file"
+                FAILED_COUNT=$((FAILED_COUNT + 1))
+                RESULTS="$RESULTS❌ $file\n"
+              fi
+            else
+              echo "⏭️ Skipped: $file (file not found)"
+              SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+              RESULTS="$RESULTS⏭️ $file (not found)\n"
+            fi
+
+            # Small delay between posts
+            sleep 3
+          done
+
+          # Save results for notifications
+          echo "success_count=$SUCCESS_COUNT" >> $GITHUB_OUTPUT
+          echo "failed_count=$FAILED_COUNT" >> $GITHUB_OUTPUT
+          echo "skipped_count=$SKIPPED_COUNT" >> $GITHUB_OUTPUT
+          echo "results<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$RESULTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Notify Slack on Success
+        if: success() && steps.analyze.outputs.files_count > 0 && secrets.SLACK_WEBHOOK_URL != ''
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#blog-updates'
+          username: 'Auto-CrossPost Bot'
+          icon_emoji: ':rocket:'
+          title: '🎉 Blog Posts Cross-Posted Successfully'
+          text: |
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+
+            📊 Summary:
+            • Files processed: ${{ steps.analyze.outputs.files_count }}
+            • Successful: ${{ steps.crosspost.outputs.success_count }}
+            • Failed: ${{ steps.crosspost.outputs.failed_count }}
+            • Skipped: ${{ steps.crosspost.outputs.skipped_count }}
+
+            📝 Posts:
+            ${{ steps.crosspost.outputs.results }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack on Failure
+        if: failure() && secrets.SLACK_WEBHOOK_URL != ''
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#blog-updates'
+          username: 'Auto-CrossPost Bot'
+          icon_emoji: ':x:'
+          title: '❌ Cross-Posting Failed'
+          text: |
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+
+            🔍 Check the workflow logs for details:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Discord on Success
+        if: success() && steps.analyze.outputs.files_count > 0 && secrets.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [
+                {
+                  "title": "🎉 Blog Posts Cross-Posted Successfully",
+                  "description": "Auto-CrossPost workflow completed successfully",
+                  "color": 65280,
+                  "fields": [
+                    {
+                      "name": "Repository",
+                      "value": "${{ github.repository }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Branch",
+                      "value": "${{ github.ref_name }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Files Processed",
+                      "value": "${{ steps.analyze.outputs.files_count }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Results",
+                      "value": "✅ Success: ${{ steps.crosspost.outputs.success_count }}\n❌ Failed: ${{ steps.crosspost.outputs.failed_count }}\n⏭️ Skipped: ${{ steps.crosspost.outputs.skipped_count }}",
+                      "inline": false
+                    }
+                  ],
+                  "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%S.000Z)'"
+                }
+              ]
+            }' \
+            "${{ secrets.DISCORD_WEBHOOK_URL }}"
+
+      - name: Notify Discord on Failure
+        if: failure() && secrets.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [
+                {
+                  "title": "❌ Cross-Posting Failed",
+                  "description": "Auto-CrossPost workflow encountered errors",
+                  "color": 16711680,
+                  "fields": [
+                    {
+                      "name": "Repository",
+                      "value": "${{ github.repository }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Branch",
+                      "value": "${{ github.ref_name }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Workflow Run",
+                      "value": "[View Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                      "inline": false
+                    }
+                  ],
+                  "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%S.000Z)'"
+                }
+              ]
+            }' \
+            "${{ secrets.DISCORD_WEBHOOK_URL }}"
+
+      - name: Create summary comment (for PRs)
+        if: github.event_name == 'pull_request' && steps.analyze.outputs.files_count > 0
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const metadata = JSON.parse(`${{ steps.analyze.outputs.metadata }}`);
+            const successCount = '${{ steps.crosspost.outputs.success_count }}' || '0';
+            const failedCount = '${{ steps.crosspost.outputs.failed_count }}' || '0';
+
+            const body = `
+            ## 📝 Auto-CrossPost Summary
+
+            **Files processed:** ${metadata.length}
+            **Successful:** ${successCount}
+            **Failed:** ${failedCount}
+
+            ### Posts Details:
+            ${metadata.map(post => `
+            - **${post.title}**
+              - File: \`${post.file}\`
+              - Tags: ${post.tags.join(', ') || 'None'}
+              - Cross-post enabled: ${post.crosspost ? '✅' : '❌'}
+            `).join('\n')}
+
+            ${failedCount > 0 ? '⚠️ Some posts failed to cross-post. Check the workflow logs for details.' : '🎉 All posts were successfully cross-posted!'}
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Final summary
+        if: always()
+        run: |
+          echo "📊 Workflow Summary"
+          echo "=================="
+          echo "Files processed: ${{ steps.analyze.outputs.files_count }}"
+          echo "Status: ${{ job.status }}"
+
+          if [ "${{ steps.analyze.outputs.files_count }}" = "0" ]; then
+            echo "📭 No markdown files were changed in this push"
+          else
+            echo "✅ Success: ${{ steps.crosspost.outputs.success_count }}"
+            echo "❌ Failed: ${{ steps.crosspost.outputs.failed_count }}"
+            echo "⏭️ Skipped: ${{ steps.crosspost.outputs.skipped_count }}"
+          fi

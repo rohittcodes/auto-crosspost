@@ -16,5 +16,8 @@ export * from './platforms/index.js';
 export { ConfigManager } from './config/index.js';
 export { MarkdownParser } from './utils/markdown-parser.js';
 
+// GitHub Actions utilities
+export * from './utils/github-actions/index.js';
+
 // Version info
 export const VERSION = '0.1.0';

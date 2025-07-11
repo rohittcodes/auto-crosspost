@@ -1,0 +1,92 @@
+name: Auto CrossPost - Basic
+
+# This workflow automatically cross-posts your markdown blog posts
+# to configured platforms whenever you push changes to the main branch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'posts/**/*.md'
+      - 'content/**/*.md'
+      - 'blog/**/*.md'
+
+jobs:
+  crosspost:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Needed to detect changed files
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Auto-CrossPost
+        run: npm install -g auto-crosspost
+
+      - name: Create configuration file
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          HASHNODE_ACCESS_TOKEN: ${{ secrets.HASHNODE_ACCESS_TOKEN }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+        run: |
+          cat > crosspost.config.json << EOF
+          {
+            "platforms": {
+              "devto": {
+                "apiKey": "$DEVTO_API_KEY"
+              },
+              "hashnode": {
+                "accessToken": "$HASHNODE_ACCESS_TOKEN",
+                "publicationId": "$HASHNODE_PUBLICATION_ID"
+              }
+            },
+            "defaults": {
+              "publishStatus": "published"
+            },
+            "logging": {
+              "level": "info"
+            }
+          }
+          EOF
+
+      - name: Get changed markdown files
+        id: changed-files
+        run: |
+          # Get list of changed markdown files
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- '*.md' '**/*.md' | tr '\n' ' ')
+          echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "Changed files: $CHANGED_FILES"
+
+      - name: Cross-post changed files
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          # Cross-post each changed file
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [ -f "$file" ]; then
+              echo "📝 Cross-posting: $file"
+              if crosspost post "$file" --config crosspost.config.json; then
+                echo "✅ Successfully cross-posted: $file"
+              else
+                echo "❌ Failed to cross-post: $file"
+                exit 1
+              fi
+            else
+              echo "⚠️ File not found: $file (possibly deleted)"
+            fi
+          done
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "🎉 All files cross-posted successfully!"
+          else
+            echo "💥 Some files failed to cross-post. Check the logs above."
+          fi

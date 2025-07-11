@@ -1,0 +1,182 @@
+name: Auto CrossPost - Batch Processing
+
+# This workflow runs on a schedule to batch process posts
+# Useful for handling rate limits and processing large numbers of posts
+
+on:
+  schedule:
+    # Run every day at 9 AM UTC (adjust for your timezone)
+    - cron: '0 9 * * *'
+
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: 'Directory to process (default: posts/)'
+        required: false
+        default: 'posts/'
+      dry_run:
+        description: 'Perform dry run (no actual posting)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  batch-crosspost:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Auto-CrossPost
+        run: npm install -g auto-crosspost
+
+      - name: Create batch configuration
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          HASHNODE_ACCESS_TOKEN: ${{ secrets.HASHNODE_ACCESS_TOKEN }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+        run: |
+          cat > crosspost.config.json << EOF
+          {
+            "platforms": {
+              "devto": {
+                "apiKey": "$DEVTO_API_KEY"
+              },
+              "hashnode": {
+                "accessToken": "$HASHNODE_ACCESS_TOKEN",
+                "publicationId": "$HASHNODE_PUBLICATION_ID"
+              }
+            },
+            "batch": {
+              "enabled": true,
+              "delay": 30000,
+              "maxConcurrent": 2,
+              "retries": 3,
+              "retryDelay": 5000
+            },
+            "defaults": {
+              "publishStatus": "published"
+            },
+            "logging": {
+              "level": "info"
+            }
+          }
+          EOF
+
+      - name: Determine processing directory
+        id: setup
+        run: |
+          if [ "${{ github.event.inputs.directory }}" != "" ]; then
+            DIR="${{ github.event.inputs.directory }}"
+          else
+            DIR="posts/"
+          fi
+
+          # Remove trailing slash and ensure it exists
+          DIR=$(echo "$DIR" | sed 's:/*$::')
+
+          if [ ! -d "$DIR" ]; then
+            echo "⚠️  Directory $DIR not found, trying common alternatives..."
+            if [ -d "content" ]; then
+              DIR="content"
+            elif [ -d "blog" ]; then
+              DIR="blog"
+            elif [ -d "src/content" ]; then
+              DIR="src/content"
+            else
+              echo "❌ No suitable directory found"
+              exit 1
+            fi
+          fi
+
+          echo "directory=$DIR" >> $GITHUB_OUTPUT
+          echo "📁 Processing directory: $DIR"
+
+      - name: List files to process
+        run: |
+          echo "📋 Files that will be processed:"
+          find "${{ steps.setup.outputs.directory }}" -name "*.md" -type f | head -20
+
+          TOTAL_FILES=$(find "${{ steps.setup.outputs.directory }}" -name "*.md" -type f | wc -l)
+          echo "📊 Total markdown files found: $TOTAL_FILES"
+
+          if [ $TOTAL_FILES -gt 50 ]; then
+            echo "⚠️  Large number of files detected. This may take a while and could hit rate limits."
+          fi
+
+      - name: Batch cross-post (Dry Run)
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "🧪 Performing dry run..."
+          crosspost batch "${{ steps.setup.outputs.directory }}" \
+            --config crosspost.config.json \
+            --dry-run
+
+      - name: Batch cross-post (Live)
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          echo "🚀 Starting batch cross-posting..."
+
+          # Create a log file for detailed tracking
+          LOG_FILE="crosspost-$(date +%Y%m%d-%H%M%S).log"
+
+          # Run batch command with output logging
+          if crosspost batch "${{ steps.setup.outputs.directory }}" \
+            --config crosspost.config.json 2>&1 | tee "$LOG_FILE"; then
+            echo "✅ Batch processing completed successfully"
+          else
+            echo "❌ Batch processing failed"
+            echo "📝 Log contents:"
+            cat "$LOG_FILE"
+            exit 1
+          fi
+
+      - name: Generate summary report
+        if: always()
+        run: |
+          echo "📊 Batch Processing Summary"
+          echo "=========================="
+          echo "Date: $(date)"
+          echo "Directory: ${{ steps.setup.outputs.directory }}"
+          echo "Dry Run: ${{ github.event.inputs.dry_run }}"
+          echo "Status: ${{ job.status }}"
+          echo ""
+
+          # Count files by type
+          if [ -d "${{ steps.setup.outputs.directory }}" ]; then
+            echo "📁 Directory Analysis:"
+            echo "   Total .md files: $(find "${{ steps.setup.outputs.directory }}" -name "*.md" | wc -l)"
+            echo "   Total .mdx files: $(find "${{ steps.setup.outputs.directory }}" -name "*.mdx" | wc -l)"
+            echo ""
+          fi
+
+          # Show recent files (potentially new posts)
+          echo "📅 Recently modified files (last 7 days):"
+          find "${{ steps.setup.outputs.directory }}" -name "*.md" -mtime -7 -type f | head -10
+
+          if [ "${{ job.status }}" = "success" ]; then
+            echo ""
+            echo "🎉 Batch cross-posting workflow completed successfully!"
+          else
+            echo ""
+            echo "💥 Workflow encountered errors. Check logs for details."
+          fi
+
+      - name: Upload logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: crosspost-logs-${{ github.run_number }}
+          path: crosspost-*.log
+          retention-days: 30

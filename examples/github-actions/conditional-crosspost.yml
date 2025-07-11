@@ -1,0 +1,165 @@
+name: Auto CrossPost - Conditional
+
+# This workflow only cross-posts files that have 'crosspost: true'
+# in their frontmatter, giving you granular control over what gets posted
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'posts/**/*.md'
+      - 'content/**/*.md'
+      - 'blog/**/*.md'
+
+jobs:
+  conditional-crosspost:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install -g auto-crosspost
+          npm install js-yaml gray-matter
+
+      - name: Create configuration file
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          HASHNODE_ACCESS_TOKEN: ${{ secrets.HASHNODE_ACCESS_TOKEN }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+        run: |
+          cat > crosspost.config.json << EOF
+          {
+            "platforms": {
+              "devto": {
+                "apiKey": "$DEVTO_API_KEY"
+              },
+              "hashnode": {
+                "accessToken": "$HASHNODE_ACCESS_TOKEN",
+                "publicationId": "$HASHNODE_PUBLICATION_ID"
+              }
+            },
+            "defaults": {
+              "publishStatus": "published"
+            },
+            "logging": {
+              "level": "info"
+            }
+          }
+          EOF
+
+      - name: Create frontmatter checker script
+        run: |
+          cat > check-frontmatter.js << 'EOF'
+          const fs = require('fs');
+          const matter = require('gray-matter');
+
+          async function checkAndCrossPost(filePath) {
+            try {
+              if (!fs.existsSync(filePath)) {
+                console.log(`⚠️  File not found: ${filePath}`);
+                return;
+              }
+
+              const fileContent = fs.readFileSync(filePath, 'utf8');
+              const { data: frontmatter } = matter(fileContent);
+
+              // Check various conditions for cross-posting
+              const shouldCrossPost =
+                frontmatter.crosspost === true ||
+                frontmatter.published === true ||
+                (frontmatter.status === 'published' && frontmatter.crosspost !== false);
+
+              if (shouldCrossPost) {
+                console.log(`📝 Cross-posting: ${filePath}`);
+                console.log(`   Title: ${frontmatter.title || 'Untitled'}`);
+                console.log(`   Tags: ${frontmatter.tags ? frontmatter.tags.join(', ') : 'None'}`);
+
+                const { exec } = require('child_process');
+                const { promisify } = require('util');
+                const execAsync = promisify(exec);
+
+                try {
+                  const { stdout, stderr } = await execAsync(
+                    `crosspost post "${filePath}" --config crosspost.config.json`
+                  );
+                  console.log(`✅ Successfully cross-posted: ${filePath}`);
+                  if (stdout) console.log(stdout);
+                } catch (error) {
+                  console.error(`❌ Failed to cross-post: ${filePath}`);
+                  console.error(error.message);
+                  process.exit(1);
+                }
+              } else {
+                console.log(`⏭️  Skipping: ${filePath} (crosspost not enabled)`);
+                console.log(`   Frontmatter: crosspost=${frontmatter.crosspost}, published=${frontmatter.published}`);
+              }
+            } catch (error) {
+              console.error(`💥 Error processing ${filePath}:`, error.message);
+              process.exit(1);
+            }
+          }
+
+          // Process files from command line arguments
+          const files = process.argv.slice(2);
+
+          async function processFiles() {
+            for (const file of files) {
+              await checkAndCrossPost(file);
+              // Add delay between files to respect rate limits
+              await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+          }
+
+          processFiles().catch(error => {
+            console.error('Fatal error:', error);
+            process.exit(1);
+          });
+          EOF
+
+      - name: Get changed markdown files
+        id: changed-files
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- '*.md' '**/*.md')
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "📋 Changed files detected:"
+            echo "$CHANGED_FILES" | while read file; do
+              echo "  - $file"
+            done
+          else
+            echo "📭 No markdown files changed"
+          fi
+
+      - name: Process files with frontmatter check
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          echo "🔍 Checking frontmatter and cross-posting eligible files..."
+          echo "${{ steps.changed-files.outputs.files }}" | tr '\n' '\0' | xargs -0 node check-frontmatter.js
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "📊 Workflow Summary:"
+          echo "   Branch: ${{ github.ref_name }}"
+          echo "   Commit: ${{ github.sha }}"
+          echo "   Status: ${{ job.status }}"
+
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "🎉 Conditional cross-posting completed successfully!"
+          else
+            echo "💥 Some operations failed. Check the logs above for details."
+          fi

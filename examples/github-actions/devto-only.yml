@@ -1,0 +1,102 @@
+name: Auto CrossPost - Dev.to Only
+
+# This workflow only cross-posts to Dev.to
+# Useful if you only use Dev.to or want to test one platform first
+
+on:
+  push:
+    branches: [main]
+    paths: 
+      - 'posts/**/*.md'
+      - 'content/**/*.md'
+      - 'blog/**/*.md'
+
+jobs:
+  devto-crosspost:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install Auto-CrossPost
+        run: npm install -g auto-crosspost
+      
+      - name: Create Dev.to only configuration
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+        run: |
+          cat > crosspost.config.json << EOF
+          {
+            "platforms": {
+              "devto": {
+                "apiKey": "$DEVTO_API_KEY"
+              }
+            },
+            "defaults": {
+              "publishStatus": "published"
+            },
+            "logging": {
+              "level": "info"
+            }
+          }
+          EOF
+      
+      - name: Get changed markdown files
+        id: changed-files
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- '*.md' '**/*.md')
+          echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "📋 Files to cross-post to Dev.to:"
+            echo "$CHANGED_FILES" | while read file; do
+              echo "  - $file"
+            done
+          fi
+      
+      - name: Cross-post to Dev.to
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          echo "🚀 Starting Dev.to cross-posting..."
+          
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [ -f "$file" ]; then
+              echo "📝 Cross-posting to Dev.to: $file"
+              
+              if crosspost post "$file" --config crosspost.config.json --platform devto; then
+                echo "✅ Successfully posted to Dev.to: $file"
+              else
+                echo "❌ Failed to post to Dev.to: $file"
+                exit 1
+              fi
+              
+              # Respect rate limits
+              sleep 5
+            else
+              echo "⚠️ File not found: $file"
+            fi
+          done
+      
+      - name: Summary
+        if: always()
+        run: |
+          echo "📊 Dev.to Cross-posting Summary"
+          echo "=============================="
+          echo "Status: ${{ job.status }}"
+          echo "Files processed: $(echo '${{ steps.changed-files.outputs.files }}' | wc -w)"
+          
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "🎉 All posts successfully cross-posted to Dev.to!"
+            echo "👀 Check your Dev.to dashboard: https://dev.to/dashboard"
+          else
+            echo "💥 Some posts failed. Check the logs above for details."
+          fi
