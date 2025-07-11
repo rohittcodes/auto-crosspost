@@ -6,8 +6,8 @@ hero:
   text: "Automate Your Blog Distribution"
   tagline: Cross-post your markdown content to multiple platforms with zero configuration
   image:
-    src: /hero-image.svg
-    alt: Auto-CrossPost SDK
+    src: /hero-graphic.svg
+    alt: Auto-CrossPost SDK - One SDK, Multiple Platforms
   actions:
     - theme: brand
       text: Get Started
