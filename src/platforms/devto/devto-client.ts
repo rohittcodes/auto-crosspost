@@ -1,15 +1,15 @@
 import axios, { AxiosInstance } from 'axios';
-import { BaseClient } from '../../core/base-client.js';
+import { BaseClient } from '../../core/base-client.ts';
 import {
-  Post,
-  PlatformClient,
-  PlatformPost,
-  ListPostsOptions,
   AuthenticationError,
-  ValidationError,
-  PlatformError
-} from '../../core/types.js';
-import { DevToConfig, DevToPost, DevToArticle } from './types.js';
+  ListPostsOptions,
+  PlatformClient,
+  PlatformError,
+  PlatformPost,
+  Post,
+  ValidationError
+} from '../../core/types.ts';
+import { DevToArticle, DevToConfig, DevToPost } from './types.ts';
 
 export class DevToClient extends BaseClient implements PlatformClient {
   public readonly name = 'Dev.to';
@@ -19,7 +19,7 @@ export class DevToClient extends BaseClient implements PlatformClient {
   constructor(config: DevToConfig) {
     super(config);
     this.apiKey = config.apiKey;
-    
+
     this.client = axios.create({
       baseURL: 'https://dev.to/api',
       headers: {
@@ -47,8 +47,8 @@ export class DevToClient extends BaseClient implements PlatformClient {
   public async authenticate(): Promise<boolean> {
     try {
       const response = await this.client.get('/users/me');
-      this.logger?.info('Dev.to authentication successful', { 
-        username: response.data.username 
+      this.logger?.info('Dev.to authentication successful', {
+        username: response.data.username
       });
       return true;
     } catch (error) {
@@ -59,9 +59,9 @@ export class DevToClient extends BaseClient implements PlatformClient {
 
   public async createPost(post: Post): Promise<PlatformPost> {
     this.validatePost(post);
-    
+
     const devtoPost = this.transformToDevToPost(post);
-    
+
     const response = await this.executeWithRetry(async () => {
       return await this.client.post('/articles', {
         article: devtoPost
@@ -69,10 +69,10 @@ export class DevToClient extends BaseClient implements PlatformClient {
     });
 
     const createdArticle: DevToArticle = response.data;
-    
-    this.logger?.info('Dev.to post created successfully', { 
+
+    this.logger?.info('Dev.to post created successfully', {
       id: createdArticle.id,
-      title: createdArticle.title 
+      title: createdArticle.title
     });
 
     return this.transformToPlatformPost(createdArticle);
@@ -80,20 +80,20 @@ export class DevToClient extends BaseClient implements PlatformClient {
 
   public async updatePost(platformId: string, post: Post): Promise<PlatformPost> {
     this.validatePost(post);
-    
+
     const devtoPost = this.transformToDevToPost(post);
-    
+
     const response = await this.executeWithRetry(async () => {
-      return await this.client.put(`/articles/${platformId}`, {
+      return await this.client.put(`/articles/${ platformId }`, {
         article: devtoPost
       });
     });
 
     const updatedArticle: DevToArticle = response.data;
-    
-    this.logger?.info('Dev.to post updated successfully', { 
+
+    this.logger?.info('Dev.to post updated successfully', {
       id: updatedArticle.id,
-      title: updatedArticle.title 
+      title: updatedArticle.title
     });
 
     return this.transformToPlatformPost(updatedArticle);
@@ -101,7 +101,7 @@ export class DevToClient extends BaseClient implements PlatformClient {
 
   public async getPost(platformId: string): Promise<PlatformPost> {
     const response = await this.executeWithRetry(async () => {
-      return await this.client.get(`/articles/${platformId}`);
+      return await this.client.get(`/articles/${ platformId }`);
     });
 
     const article: DevToArticle = response.data;
@@ -110,7 +110,7 @@ export class DevToClient extends BaseClient implements PlatformClient {
 
   public async deletePost(platformId: string): Promise<boolean> {
     await this.executeWithRetry(async () => {
-      return await this.client.delete(`/articles/${platformId}`);
+      return await this.client.delete(`/articles/${ platformId }`);
     });
 
     this.logger?.info('Dev.to post deleted successfully', { id: platformId });
@@ -140,15 +140,15 @@ export class DevToClient extends BaseClient implements PlatformClient {
     if (post.description) {
       devtoPost.description = post.description;
     }
-    
+
     if (post.tags) {
       devtoPost.tags = post.tags.join(', ');
     }
-    
+
     if (post.canonicalUrl) {
       devtoPost.canonical_url = post.canonicalUrl;
     }
-    
+
     if (post.coverImage) {
       devtoPost.main_image = post.coverImage;
     }
@@ -233,7 +233,7 @@ export class DevToClient extends BaseClient implements PlatformClient {
         case 403:
           return new AuthenticationError('Dev.to API access forbidden');
         case 422:
-          return new ValidationError(`Dev.to validation error: ${data.error || 'Invalid data'}`);
+          return new ValidationError(`Dev.to validation error: ${ data.error || 'Invalid data' }`);
         case 429:
           return new PlatformError('Dev.to rate limit exceeded', 'RATE_LIMIT');
         case 500:
@@ -242,7 +242,7 @@ export class DevToClient extends BaseClient implements PlatformClient {
         case 504:
           return new PlatformError('Dev.to server error', 'SERVER_ERROR');
         default:
-          return new PlatformError(`Dev.to API error: ${data.error || 'Unknown error'}`, 'API_ERROR');
+          return new PlatformError(`Dev.to API error: ${ data.error || 'Unknown error' }`, 'API_ERROR');
       }
     }
 
@@ -254,6 +254,6 @@ export class DevToClient extends BaseClient implements PlatformClient {
       return new PlatformError('Dev.to connection failed', 'CONNECTION_ERROR');
     }
 
-    return new PlatformError(`Dev.to unexpected error: ${error.message}`, 'UNKNOWN');
+    return new PlatformError(`Dev.to unexpected error: ${ error.message }`, 'UNKNOWN');
   }
 }

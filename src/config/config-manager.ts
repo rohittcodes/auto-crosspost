@@ -1,7 +1,7 @@
-import { readFile, writeFile, access } from 'fs/promises';
-import { join, dirname } from 'path';
+import { access, readFile, writeFile } from 'fs/promises';
 import { homedir } from 'os';
-import { CrossPostConfig } from '../core/types.js';
+import { dirname, join } from 'path';
+import { CrossPostConfig } from '../core/types.ts';
 
 /**
  * Configuration manager for Auto-CrossPost SDK
@@ -96,7 +96,7 @@ export class ConfigManager {
       const configJson = JSON.stringify(sanitizedConfig, null, 2);
       await writeFile(filePath, configJson, 'utf8');
     } catch (error) {
-      throw new Error(`Failed to save configuration: ${error}`);
+      throw new Error(`Failed to save configuration: ${ error }`);
     }
   }
 
@@ -124,7 +124,7 @@ export class ConfigManager {
           } catch (parseError) {
             throw new Error(
               `YAML parsing failed. Content might be too complex for simple parser. ` +
-              `Error: ${parseError}. Try using JSON format (.crosspostrc.json) instead.`
+              `Error: ${ parseError }. Try using JSON format (.crosspostrc.json) instead.`
             );
           }
         }
@@ -136,9 +136,9 @@ export class ConfigManager {
         return configModule.default || configModule;
       }
 
-      throw new Error(`Unsupported config file format: ${filePath}`);
+      throw new Error(`Unsupported config file format: ${ filePath }`);
     } catch (error) {
-      throw new Error(`Failed to load config file ${filePath}: ${error}`);
+      throw new Error(`Failed to load config file ${ filePath }: ${ error }`);
     }
   }
 
@@ -239,19 +239,19 @@ export class ConfigManager {
     }
 
     // Validate retry settings
-    if (config.options?.retryAttempts !== undefined && 
-        (config.options.retryAttempts < 0 || config.options.retryAttempts > 10)) {
+    if (config.options?.retryAttempts !== undefined &&
+      (config.options.retryAttempts < 0 || config.options.retryAttempts > 10)) {
       errors.push('Retry attempts must be between 0 and 10');
     }
 
     // Validate log level
-    if (config.options?.logLevel && 
-        !['debug', 'info', 'warn', 'error'].includes(config.options.logLevel)) {
+    if (config.options?.logLevel &&
+      !['debug', 'info', 'warn', 'error'].includes(config.options.logLevel)) {
       errors.push('Log level must be one of: debug, info, warn, error');
     }
 
     if (errors.length > 0) {
-      throw new Error(`Configuration validation failed: ${errors.join(', ')}`);
+      throw new Error(`Configuration validation failed: ${ errors.join(', ') }`);
     }
   }
 
@@ -349,7 +349,7 @@ export class ConfigManager {
 
     for (const line of lines) {
       const trimmed = line.trim();
-      
+
       // Skip empty lines and comments
       if (!trimmed || trimmed.startsWith('#')) {
         continue;
@@ -357,19 +357,19 @@ export class ConfigManager {
 
       // Calculate indentation
       const indent = line.length - line.trimStart().length;
-      
+
       // Handle indentation changes
       while (indentStack.length > 1 && indent <= indentStack[indentStack.length - 1]) {
         indentStack.pop();
         sectionStack.pop();
       }
-      
+
       currentSection = sectionStack[sectionStack.length - 1];
 
       if (trimmed.includes(':')) {
         const [key, ...valueParts] = trimmed.split(':');
         const value = valueParts.join(':').trim();
-        
+
         if (value === '' || value === '{}' || value === '[]') {
           // This is a section header
           currentSection[key.trim()] = {};
@@ -378,7 +378,7 @@ export class ConfigManager {
         } else {
           // This is a key-value pair
           let parsedValue: any = value;
-          
+
           // Try to parse as different types
           if (value === 'true') parsedValue = true;
           else if (value === 'false') parsedValue = false;
@@ -386,7 +386,7 @@ export class ConfigManager {
           else if (value.startsWith('"') && value.endsWith('"')) {
             parsedValue = value.slice(1, -1);
           }
-          
+
           currentSection[key.trim()] = parsedValue;
         }
       } else if (trimmed.startsWith('- ')) {

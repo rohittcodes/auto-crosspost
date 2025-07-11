@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
+import chalk from 'chalk';
 import { Command } from 'commander';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
-import chalk from 'chalk';
-import { AutoCrossPost, CrossPostConfig } from '../index.js';
+import { AutoCrossPost, CrossPostConfig } from '../index.ts';
 
 const program = new Command();
 
@@ -26,39 +26,39 @@ program
       const config = await loadConfig(options.config);
       const sdk = new AutoCrossPost(config, createLogger());
 
-      console.log(chalk.blue(`📝 Cross-posting: ${file}`));
-      
+      console.log(chalk.blue(`📝 Cross-posting: ${ file }`));
+
       if (options.dryRun) {
         console.log(chalk.yellow('🔍 Dry run mode - no actual posting will occur'));
         // In dry run, just parse and show what would be posted
         const markdownFile = await import('../utils/markdown-parser').then(m => m.MarkdownParser.parseFile(resolve(file)));
         const post = await import('../utils/markdown-parser').then(m => m.MarkdownParser.toPost(markdownFile));
-        
+
         console.log(chalk.green('\n📄 Parsed content:'));
-        console.log(`Title: ${post.title}`);
-        console.log(`Description: ${post.description || 'None'}`);
-        console.log(`Tags: ${post.tags?.join(', ') || 'None'}`);
-        console.log(`Status: ${post.publishStatus}`);
+        console.log(`Title: ${ post.title }`);
+        console.log(`Description: ${ post.description || 'None' }`);
+        console.log(`Tags: ${ post.tags?.join(', ') || 'None' }`);
+        console.log(`Status: ${ post.publishStatus }`);
         return;
       }
 
       const result = await sdk.crossPostFromFile(resolve(file), options.platforms);
-      
+
       console.log(chalk.green(`\n✅ Cross-posting completed!`));
-      console.log(`Total platforms: ${result.total}`);
-      console.log(`Successful: ${chalk.green(result.successful)}`);
-      console.log(`Failed: ${chalk.red(result.failed)}`);
-      
+      console.log(`Total platforms: ${ result.total }`);
+      console.log(`Successful: ${ chalk.green(result.successful) }`);
+      console.log(`Failed: ${ chalk.red(result.failed) }`);
+
       for (const platformResult of result.results) {
         if (platformResult.success) {
-          console.log(chalk.green(`  ✓ ${platformResult.platform}: ${platformResult.platformPost?.platformUrl || 'Success'}`));
+          console.log(chalk.green(`  ✓ ${ platformResult.platform }: ${ platformResult.platformPost?.platformUrl || 'Success' }`));
         } else {
-          console.log(chalk.red(`  ✗ ${platformResult.platform}: ${platformResult.error}`));
+          console.log(chalk.red(`  ✗ ${ platformResult.platform }: ${ platformResult.error }`));
         }
       }
-      
+
     } catch (error) {
-      console.error(chalk.red(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(chalk.red(`❌ Error: ${ error instanceof Error ? error.message : 'Unknown error' }`));
       process.exit(1);
     }
   });
@@ -74,20 +74,20 @@ program
       const sdk = new AutoCrossPost(config, createLogger());
 
       console.log(chalk.blue('🔐 Testing platform authentication...'));
-      
+
       const results = await sdk.testAuthentication();
-      
+
       console.log(chalk.green('\n🔍 Authentication results:'));
       for (const [platform, success] of Object.entries(results)) {
         if (success) {
-          console.log(chalk.green(`  ✓ ${platform}: Authenticated`));
+          console.log(chalk.green(`  ✓ ${ platform }: Authenticated`));
         } else {
-          console.log(chalk.red(`  ✗ ${platform}: Authentication failed`));
+          console.log(chalk.red(`  ✗ ${ platform }: Authentication failed`));
         }
       }
-      
+
     } catch (error) {
-      console.error(chalk.red(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(chalk.red(`❌ Error: ${ error instanceof Error ? error.message : 'Unknown error' }`));
       process.exit(1);
     }
   });
@@ -104,24 +104,24 @@ program
       const config = await loadConfig(options.config);
       const sdk = new AutoCrossPost(config, createLogger());
 
-      console.log(chalk.blue(`📚 Fetching posts from ${platform}...`));
-      
+      console.log(chalk.blue(`📚 Fetching posts from ${ platform }...`));
+
       const posts = await sdk.listPosts(platform, {
         perPage: parseInt(options.limit)
       });
-      
-      console.log(chalk.green(`\n📄 Found ${posts.length} posts:`));
+
+      console.log(chalk.green(`\n📄 Found ${ posts.length } posts:`));
       for (const post of posts) {
-        console.log(`  • ${post.title} (${post.platformId})`);
-        console.log(`    Status: ${post.publishStatus} | Views: ${post.stats?.views || 0}`);
+        console.log(`  • ${ post.title } (${ post.platformId })`);
+        console.log(`    Status: ${ post.publishStatus } | Views: ${ post.stats?.views || 0 }`);
         if (post.platformUrl) {
-          console.log(`    URL: ${post.platformUrl}`);
+          console.log(`    URL: ${ post.platformUrl }`);
         }
         console.log('');
       }
-      
+
     } catch (error) {
-      console.error(chalk.red(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(chalk.red(`❌ Error: ${ error instanceof Error ? error.message : 'Unknown error' }`));
       process.exit(1);
     }
   });
@@ -153,14 +153,14 @@ program
         retryAttempts: 3
       }
     };
-    
+
     try {
       const { writeFile } = await import('fs/promises');
       await writeFile(options.output, JSON.stringify(sampleConfig, null, 2));
-      console.log(chalk.green(`✅ Configuration file created: ${options.output}`));
+      console.log(chalk.green(`✅ Configuration file created: ${ options.output }`));
       console.log(chalk.yellow('⚠️  Remember to update the API keys and tokens!'));
     } catch (error) {
-      console.error(chalk.red(`❌ Error creating config file: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(chalk.red(`❌ Error creating config file: ${ error instanceof Error ? error.message : 'Unknown error' }`));
       process.exit(1);
     }
   });
@@ -170,16 +170,16 @@ async function loadConfig(configPath: string): Promise<CrossPostConfig> {
   try {
     const configContent = await readFile(resolve(configPath), 'utf8');
     const config = JSON.parse(configContent) as CrossPostConfig;
-    
+
     // Validate required configuration
     if (!config.platforms || Object.keys(config.platforms).length === 0) {
       throw new Error('No platforms configured. Run "crosspost config" to generate a sample configuration.');
     }
-    
+
     return config;
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-      throw new Error(`Configuration file not found: ${configPath}. Run "crosspost config" to generate one.`);
+      throw new Error(`Configuration file not found: ${ configPath }. Run "crosspost config" to generate one.`);
     }
     throw error;
   }

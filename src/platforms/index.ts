@@ -1,3 +1,3 @@
-export * from './devto/index.js';
-export * from './hashnode/index.js';
+export * from './devto/index.ts';
+export * from './hashnode/index.ts';
 

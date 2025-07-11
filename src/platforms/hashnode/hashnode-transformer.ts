@@ -1,11 +1,11 @@
-import { Post, PlatformPost } from '../../core/types.js';
-import { HashnodePost, HashnodeArticle } from './types.js';
+import { PlatformPost, Post } from '../../core/types.ts';
+import { HashnodeArticle, HashnodePost } from './types.ts';
 
 /**
  * Transforms data between common Post format and Hashnode-specific formats
  */
 export class HashnodeTransformer {
-  
+
   /**
    * Transform a Post to Hashnode format
    */

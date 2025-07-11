@@ -1,12 +1,13 @@
 // Core types and interfaces
-export * from './types.js';
+export * from './types.ts';
 
 // Base client for platform implementations
-export * from './base-client.js';
+export * from './base-client.ts';
 
 // Batch processing services
-export * from './batch-processor.js';
-export * from './queue.js';
-export * from './file-watcher.js';
-export * from './scheduler.js';
-export * from './progress-reporter.js';
+export * from './batch-processor.ts';
+export * from './file-watcher.ts';
+export * from './progress-reporter.ts';
+export * from './queue.ts';
+export * from './scheduler.ts';
+

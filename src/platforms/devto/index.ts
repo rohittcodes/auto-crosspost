@@ -1,2 +1,3 @@
-export { DevToClient } from './devto-client.js';
-export * from './types.js';
+export { DevToClient } from './devto-client.ts';
+export * from './types.ts';
+

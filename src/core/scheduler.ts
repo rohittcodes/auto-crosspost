@@ -1,7 +1,7 @@
-import * as cron from 'node-cron';
 import { readdir } from 'fs/promises';
+import * as cron from 'node-cron';
 import { join } from 'path';
-import { BatchProcessor, BatchOptions } from './batch-processor.js';
+import { BatchOptions, BatchProcessor } from './batch-processor.ts';
 
 export interface SchedulerOptions {
   batchOptions?: BatchOptions;
@@ -18,20 +18,20 @@ export class CrossPostScheduler {
   scheduleDaily(time: string, directory: string): string {
     // Parse time format HH:MM
     const [hour, minute] = time.split(':').map(Number);
-    
+
     if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
       throw new Error('Invalid time format. Use HH:MM (24-hour format)');
     }
 
-    const task = cron.schedule(`${minute} ${hour} * * *`, async () => {
-      console.log(`Running daily cross-post at ${time}`);
+    const task = cron.schedule(`${ minute } ${ hour } * * *`, async () => {
+      console.log(`Running daily cross-post at ${ time }`);
       await this.processPendingPosts(directory);
     });
 
-    const jobId = `daily-${time.replace(':', '-')}`;
+    const jobId = `daily-${ time.replace(':', '-') }`;
     this.jobs.set(jobId, task);
-    
-    console.log(`Scheduled daily job: ${jobId}`);
+
+    console.log(`Scheduled daily job: ${ jobId }`);
     return jobId;
   }
 
@@ -43,20 +43,20 @@ export class CrossPostScheduler {
 
     // Parse time format HH:MM
     const [hour, minute] = time.split(':').map(Number);
-    
+
     if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
       throw new Error('Invalid time format. Use HH:MM (24-hour format)');
     }
 
-    const task = cron.schedule(`${minute} ${hour} * * ${day}`, async () => {
-      console.log(`Running weekly cross-post on day ${day} at ${time}`);
+    const task = cron.schedule(`${ minute } ${ hour } * * ${ day }`, async () => {
+      console.log(`Running weekly cross-post on day ${ day } at ${ time }`);
       await this.processPendingPosts(directory);
     });
 
-    const jobId = `weekly-${day}-${time.replace(':', '-')}`;
+    const jobId = `weekly-${ day }-${ time.replace(':', '-') }`;
     this.jobs.set(jobId, task);
 
-    console.log(`Scheduled weekly job: ${jobId}`);
+    console.log(`Scheduled weekly job: ${ jobId }`);
     return jobId;
   }
 
@@ -66,14 +66,14 @@ export class CrossPostScheduler {
     }
 
     const task = cron.schedule(cronExpression, async () => {
-      console.log(`Running custom scheduled cross-post: ${cronExpression}`);
+      console.log(`Running custom scheduled cross-post: ${ cronExpression }`);
       await this.processPendingPosts(directory);
     });
 
-    const id = jobId || `custom-${Date.now()}`;
+    const id = jobId || `custom-${ Date.now() }`;
     this.jobs.set(id, task);
 
-    console.log(`Scheduled custom job: ${id}`);
+    console.log(`Scheduled custom job: ${ id }`);
     return id;
   }
 
@@ -95,17 +95,17 @@ export class CrossPostScheduler {
         return;
       }
 
-      console.log(`Processing ${markdownFiles.length} files`);
+      console.log(`Processing ${ markdownFiles.length } files`);
       const results = await processor.processFiles(markdownFiles);
-      
+
       const successful = results.filter(r => r.success).length;
       const failed = results.filter(r => !r.success).length;
-      
-      console.log(`Scheduled job completed: ${successful} successful, ${failed} failed`);
-      
+
+      console.log(`Scheduled job completed: ${ successful } successful, ${ failed } failed`);
+
       // Log details for failed jobs
       results.filter(r => !r.success).forEach(result => {
-        console.error(`Failed: ${result.file} - ${result.error}`);
+        console.error(`Failed: ${ result.file } - ${ result.error }`);
       });
 
     } catch (error) {
@@ -126,17 +126,17 @@ export class CrossPostScheduler {
     if (task) {
       task.stop();
       this.jobs.delete(jobId);
-      console.log(`Stopped job: ${jobId}`);
+      console.log(`Stopped job: ${ jobId }`);
       return true;
     }
     return false;
   }
 
   stopAll(): void {
-    console.log(`Stopping ${this.jobs.size} scheduled jobs`);
+    console.log(`Stopping ${ this.jobs.size } scheduled jobs`);
     this.jobs.forEach((task, jobId) => {
       task.stop();
-      console.log(`Stopped job: ${jobId}`);
+      console.log(`Stopped job: ${ jobId }`);
     });
     this.jobs.clear();
   }

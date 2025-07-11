@@ -1,14 +1,14 @@
 import {
   AuthenticationError,
-  ValidationError,
-  PlatformError
-} from '../../core/types.js';
+  PlatformError,
+  ValidationError
+} from '../../core/types.ts';
 
 /**
  * Handles Hashnode-specific error transformation and mapping
  */
 export class HashnodeErrorHandler {
-  
+
   /**
    * Transform various error types to appropriate platform errors
    */
@@ -27,11 +27,11 @@ export class HashnodeErrorHandler {
       }
 
       if (firstError.extensions?.code === 'BAD_USER_INPUT') {
-        return new ValidationError(`Hashnode validation error: ${firstError.message}`);
+        return new ValidationError(`Hashnode validation error: ${ firstError.message }`);
       }
 
       return new PlatformError(
-        `Hashnode GraphQL error: ${firstError.message}`, 
+        `Hashnode GraphQL error: ${ firstError.message }`,
         'GRAPHQL_ERROR',
         'Hashnode'
       );
@@ -40,7 +40,7 @@ export class HashnodeErrorHandler {
     // Handle network errors
     if (error.code === 'ECONNABORTED') {
       return new PlatformError(
-        'Hashnode request timeout', 
+        'Hashnode request timeout',
         'TIMEOUT',
         'Hashnode'
       );
@@ -48,7 +48,7 @@ export class HashnodeErrorHandler {
 
     if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
       return new PlatformError(
-        'Hashnode connection failed', 
+        'Hashnode connection failed',
         'CONNECTION_ERROR',
         'Hashnode'
       );
@@ -74,7 +74,7 @@ export class HashnodeErrorHandler {
 
     // Default error
     return new PlatformError(
-      `Hashnode unexpected error: ${error.message}`, 
+      `Hashnode unexpected error: ${ error.message }`,
       'UNKNOWN',
       'Hashnode'
     );

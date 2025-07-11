@@ -1,10 +1,10 @@
 import { GraphQLClient } from 'graphql-request';
 import {
-  HashnodePost,
   HashnodeArticle,
+  HashnodePost,
   HashnodePublication,
   HashnodeUser
-} from './types.js';
+} from './types.ts';
 
 /**
  * Low-level API interface for Hashnode GraphQL operations
@@ -242,7 +242,7 @@ export class HashnodeApi {
 
     const response = await this.client.request<{ publication: HashnodePublication }>(
       query,
-      { 
+      {
         host: publicationId,
         first,
         ...(after && { after })

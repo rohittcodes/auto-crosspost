@@ -1,15 +1,15 @@
-import { BaseClient } from '../../core/base-client.js';
+import { BaseClient } from '../../core/base-client.ts';
 import {
-  Post,
+  ListPostsOptions,
   PlatformClient,
   PlatformPost,
-  ListPostsOptions,
+  Post,
   ValidationError
-} from '../../core/types.js';
-import { HashnodeConfig } from './types.js';
-import { HashnodeApi } from './hashnode-api.js';
-import { HashnodeTransformer } from './hashnode-transformer.js';
-import { HashnodeErrorHandler } from './hashnode-error-handler.js';
+} from '../../core/types.ts';
+import { HashnodeApi } from './hashnode-api.ts';
+import { HashnodeErrorHandler } from './hashnode-error-handler.ts';
+import { HashnodeTransformer } from './hashnode-transformer.ts';
+import { HashnodeConfig } from './types.ts';
 
 /**
  * Hashnode platform client
@@ -23,7 +23,7 @@ export class HashnodeClient extends BaseClient implements PlatformClient {
   constructor(config: HashnodeConfig) {
     super(config);
     this.api = new HashnodeApi(config.token);
-    
+
     if (config.publicationId) {
       this.publicationId = config.publicationId;
     }
@@ -32,15 +32,15 @@ export class HashnodeClient extends BaseClient implements PlatformClient {
   public async authenticate(): Promise<boolean> {
     try {
       const user = await this.api.getCurrentUser();
-      
+
       if (!user) {
         throw new ValidationError('Invalid Hashnode token');
       }
 
-      this.logger?.info('Hashnode authentication successful', { 
-        username: user.username 
+      this.logger?.info('Hashnode authentication successful', {
+        username: user.username
       });
-      
+
       return true;
     } catch (error) {
       this.logger?.error('Hashnode authentication failed', { error });
@@ -50,19 +50,19 @@ export class HashnodeClient extends BaseClient implements PlatformClient {
 
   public async createPost(post: Post): Promise<PlatformPost> {
     this.validatePost(post);
-    
+
     if (!this.publicationId) {
       throw new ValidationError('Hashnode publication ID is required');
     }
 
     try {
       const hashnodePost = HashnodeTransformer.toHashnodePost(post, this.publicationId);
-      
+
       const createdArticle = await this.executeWithRetry(async () => {
         return await this.api.createPost(hashnodePost);
       });
-      
-      this.logger?.info('Hashnode post created successfully', { 
+
+      this.logger?.info('Hashnode post created successfully', {
         id: createdArticle.id,
         title: createdArticle.title,
         url: createdArticle.url
@@ -76,19 +76,19 @@ export class HashnodeClient extends BaseClient implements PlatformClient {
 
   public async updatePost(platformId: string, post: Post): Promise<PlatformPost> {
     this.validatePost(post);
-    
+
     if (!this.publicationId) {
       throw new ValidationError('Hashnode publication ID is required');
     }
 
     try {
       const hashnodePost = HashnodeTransformer.toHashnodePost(post, this.publicationId);
-      
+
       const updatedArticle = await this.executeWithRetry(async () => {
         return await this.api.updatePost(platformId, hashnodePost);
       });
-      
-      this.logger?.info('Hashnode post updated successfully', { 
+
+      this.logger?.info('Hashnode post updated successfully', {
         id: updatedArticle.id,
         title: updatedArticle.title,
         url: updatedArticle.url
@@ -152,7 +152,7 @@ export class HashnodeClient extends BaseClient implements PlatformClient {
 
     // Use the transformer's validation method
     const errors = HashnodeTransformer.validateForHashnode(post);
-    
+
     if (errors.length > 0) {
       throw new ValidationError(errors[0]);
     }

@@ -1,7 +1,7 @@
-import matter from 'gray-matter';
 import { readFile } from 'fs/promises';
+import matter from 'gray-matter';
 import { extname } from 'path';
-import { Post, MarkdownFile } from '../core/types.js';
+import { MarkdownFile, Post } from '../core/types.ts';
 
 /**
  * Utility class for parsing markdown and MDX files with frontmatter
@@ -14,20 +14,20 @@ export class MarkdownParser {
     try {
       const content = await readFile(filePath, 'utf8');
       const extension = extname(filePath);
-      
+
       if (!['.md', '.mdx', '.markdown'].includes(extension.toLowerCase())) {
-        throw new Error(`Unsupported file type: ${extension}`);
+        throw new Error(`Unsupported file type: ${ extension }`);
       }
 
       const parsed = matter(content);
-      
+
       return {
         path: filePath,
         frontmatter: parsed.data,
         content: parsed.content
       };
     } catch (error) {
-      throw new Error(`Failed to parse markdown file ${filePath}: ${error}`);
+      throw new Error(`Failed to parse markdown file ${ filePath }: ${ error }`);
     }
   }
 
@@ -36,7 +36,7 @@ export class MarkdownParser {
    */
   static parseContent(content: string): MarkdownFile {
     const parsed = matter(content);
-    
+
     return {
       path: '',
       frontmatter: parsed.data,
@@ -49,7 +49,7 @@ export class MarkdownParser {
    */
   static toPost(markdownFile: MarkdownFile): Post {
     const frontmatter = markdownFile.frontmatter;
-    
+
     // Extract title
     let title = frontmatter.title;
     if (!title) {
@@ -66,7 +66,7 @@ export class MarkdownParser {
         .split('\n\n')
         .filter(p => p.trim() && !p.startsWith('#') && !p.startsWith('```'))
         .map(p => p.replace(/\n/g, ' ').trim());
-      
+
       if (paragraphs.length > 0) {
         description = paragraphs[0].substring(0, 200);
         if (paragraphs[0].length > 200) {
@@ -82,8 +82,8 @@ export class MarkdownParser {
     }
 
     // Extract publish status
-    const publishStatus = frontmatter.published === false || frontmatter.draft === true 
-      ? 'draft' 
+    const publishStatus = frontmatter.published === false || frontmatter.draft === true
+      ? 'draft'
       : 'published';
 
     // Extract published date
@@ -91,7 +91,7 @@ export class MarkdownParser {
     if (frontmatter.date || frontmatter.publishedAt || frontmatter.published_at) {
       const dateValue = frontmatter.date || frontmatter.publishedAt || frontmatter.published_at;
       publishedAt = new Date(dateValue);
-      
+
       if (isNaN(publishedAt.getTime())) {
         publishedAt = undefined;
       }
@@ -159,7 +159,7 @@ export class MarkdownParser {
     }
 
     if (errors.length > 0) {
-      throw new Error(`Frontmatter validation failed: ${errors.join(', ')}`);
+      throw new Error(`Frontmatter validation failed: ${ errors.join(', ') }`);
     }
   }
 
@@ -168,7 +168,7 @@ export class MarkdownParser {
    */
   static extractPlatformConfig(frontmatter: Record<string, any>, platform: string): Record<string, any> {
     const platformConfig = frontmatter[platform.toLowerCase()] || frontmatter[platform] || {};
-    
+
     return {
       ...platformConfig,
       // Include global overrides
@@ -213,19 +213,19 @@ export class MarkdownParser {
     // Generate YAML frontmatter
     const yamlLines = Object.entries(frontmatter).map(([key, value]) => {
       if (Array.isArray(value)) {
-        const arrayItems = value.map(item => `  - ${item}`).join('\n');
-        return `${key}:\n${arrayItems}`;
+        const arrayItems = value.map(item => `  - ${ item }`).join('\n');
+        return `${ key }:\n${ arrayItems }`;
       }
-      
+
       if (typeof value === 'string' && (value.includes('\n') || value.includes(':'))) {
-        return `${key}: |
-  ${value.replace(/\n/g, '\n  ')}`;
+        return `${ key }: |
+  ${ value.replace(/\n/g, '\n  ') }`;
       }
-      
-      return `${key}: ${value}`;
+
+      return `${ key }: ${ value }`;
     });
 
-    return `---\n${yamlLines.join('\n')}\n---`;
+    return `---\n${ yamlLines.join('\n') }\n---`;
   }
 
   /**
@@ -233,6 +233,6 @@ export class MarkdownParser {
    */
   static createMarkdownFile(post: Post, frontmatterFormat: 'yaml' | 'json' = 'yaml'): string {
     const frontmatter = this.generateFrontmatter(post, frontmatterFormat);
-    return `${frontmatter}\n\n${post.content}`;
+    return `${ frontmatter }\n\n${ post.content }`;
   }
 }

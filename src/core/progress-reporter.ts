@@ -1,4 +1,4 @@
-import { BatchResult } from './batch-processor.js';
+import { BatchResult } from './batch-processor.ts';
 
 export interface BatchReport {
   totalJobs: number;
@@ -24,7 +24,7 @@ export class BatchProgressReporter {
 
   reportProgress(result: BatchResult): void {
     this.results.push(result);
-    
+
     if (result.success) {
       this.completedJobs++;
     } else {
@@ -42,15 +42,15 @@ export class BatchProgressReporter {
     const eta = processed > 0 ? Math.round((this.totalJobs - processed) / rate) : 0;
 
     console.log(
-      `Progress: ${processed}/${this.totalJobs} (${percentage}%) | ` +
-      `✅ ${this.completedJobs} ❌ ${this.failedJobs} | ` +
-      `Rate: ${rate.toFixed(1)}/s | ETA: ${eta}s`
+      `Progress: ${ processed }/${ this.totalJobs } (${ percentage }%) | ` +
+      `✅ ${ this.completedJobs } ❌ ${ this.failedJobs } | ` +
+      `Rate: ${ rate.toFixed(1) }/s | ETA: ${ eta }s`
     );
   }
 
   getFinalReport(): BatchReport {
     const totalTime = Date.now() - this.startTime.getTime();
-    
+
     return {
       totalJobs: this.totalJobs,
       completedJobs: this.completedJobs,
@@ -65,21 +65,21 @@ export class BatchProgressReporter {
   printFinalReport(): void {
     const report = this.getFinalReport();
     const duration = (report.totalTime / 1000).toFixed(1);
-    
+
     console.log('\n📊 Batch Processing Complete');
-    console.log(`Total: ${report.totalJobs}`);
-    console.log(`✅ Successful: ${report.completedJobs}`);
-    console.log(`❌ Failed: ${report.failedJobs}`);
-    console.log(`Success Rate: ${report.successRate.toFixed(1)}%`);
-    console.log(`Total Time: ${duration}s`);
-    console.log(`Average Time per Job: ${(report.averageTime / 1000).toFixed(2)}s`);
+    console.log(`Total: ${ report.totalJobs }`);
+    console.log(`✅ Successful: ${ report.completedJobs }`);
+    console.log(`❌ Failed: ${ report.failedJobs }`);
+    console.log(`Success Rate: ${ report.successRate.toFixed(1) }%`);
+    console.log(`Total Time: ${ duration }s`);
+    console.log(`Average Time per Job: ${ (report.averageTime / 1000).toFixed(2) }s`);
 
     // Show failed jobs
     const failedResults = report.results.filter(r => !r.success);
     if (failedResults.length > 0) {
       console.log('\n❌ Failed Jobs:');
       failedResults.forEach(result => {
-        console.log(`  • ${result.file}: ${result.error}`);
+        console.log(`  • ${ result.file }: ${ result.error }`);
       });
     }
   }

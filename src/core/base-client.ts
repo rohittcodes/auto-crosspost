@@ -1,4 +1,4 @@
-import { PlatformClient, Post, PlatformPost, ListPostsOptions, CrossPostError } from './types.js';
+import { CrossPostError, ListPostsOptions, PlatformClient, PlatformPost, Post } from './types.ts';
 
 /**
  * Abstract base class for platform clients
@@ -6,16 +6,16 @@ import { PlatformClient, Post, PlatformPost, ListPostsOptions, CrossPostError } 
  */
 export abstract class BaseClient implements PlatformClient {
   abstract readonly name: string;
-  
+
   protected constructor(
     protected config: Record<string, any>,
     protected logger?: { log: (...args: any[]) => void; info: (...args: any[]) => void; warn: (...args: any[]) => void; error: (...args: any[]) => void; }
   ) {
     this.logger = logger || {
-      log: () => {},
-      info: () => {},
-      warn: () => {},
-      error: () => {}
+      log: () => { },
+      info: () => { },
+      warn: () => { },
+      error: () => { }
     };
   }
 
@@ -25,11 +25,11 @@ export abstract class BaseClient implements PlatformClient {
   abstract updatePost(platformId: string, post: Post): Promise<PlatformPost>;
   abstract deletePost(platformId: string): Promise<boolean>;
   abstract getPost(platformId: string): Promise<PlatformPost>;
-  
+
   // Default implementation that can be overridden
   async listPosts(_options?: ListPostsOptions): Promise<PlatformPost[]> {
     // Default implementation - platforms can override this
-    throw new Error(`listPosts not implemented for ${this.name}`);
+    throw new Error(`listPosts not implemented for ${ this.name }`);
   }
 
   // Common utility methods
@@ -40,7 +40,7 @@ export abstract class BaseClient implements PlatformClient {
     try {
       return await operation();
     } catch (error) {
-      this.logger?.error(`[${this.name}] ${context} failed:`, error);
+      this.logger?.error(`[${ this.name }] ${ context } failed:`, error);
       throw this.transformError(error, context);
     }
   }
@@ -57,7 +57,7 @@ export abstract class BaseClient implements PlatformClient {
 
       if (status === 401 || status === 403) {
         return new CrossPostError(
-          `Authentication failed: ${message}`,
+          `Authentication failed: ${ message }`,
           this.name,
           'AUTH_ERROR',
           status
@@ -67,7 +67,7 @@ export abstract class BaseClient implements PlatformClient {
       if (status === 429) {
         const retryAfter = error.response.headers['retry-after'];
         return new CrossPostError(
-          `Rate limit exceeded: ${message}`,
+          `Rate limit exceeded: ${ message }`,
           this.name,
           'RATE_LIMIT',
           retryAfter ? parseInt(retryAfter) * 1000 : 60000
@@ -76,7 +76,7 @@ export abstract class BaseClient implements PlatformClient {
 
       if (status >= 400 && status < 500) {
         return new CrossPostError(
-          `Client error: ${message}`,
+          `Client error: ${ message }`,
           this.name,
           'CLIENT_ERROR',
           status
@@ -85,7 +85,7 @@ export abstract class BaseClient implements PlatformClient {
 
       if (status >= 500) {
         return new CrossPostError(
-          `Server error: ${message}`,
+          `Server error: ${ message }`,
           this.name,
           'SERVER_ERROR',
           status
@@ -96,7 +96,7 @@ export abstract class BaseClient implements PlatformClient {
     // Handle network errors
     if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
       return new CrossPostError(
-        `Network error: ${error.message}`,
+        `Network error: ${ error.message }`,
         this.name,
         'NETWORK_ERROR'
       );
@@ -104,7 +104,7 @@ export abstract class BaseClient implements PlatformClient {
 
     // Default error
     return new CrossPostError(
-      `${context} failed: ${error.message || 'Unknown error'}`,
+      `${ context } failed: ${ error.message || 'Unknown error' }`,
       this.name,
       'UNKNOWN_ERROR'
     );
@@ -125,15 +125,15 @@ export abstract class BaseClient implements PlatformClient {
 
         // Don't retry on authentication errors or client errors (4xx)
         if (error instanceof CrossPostError) {
-          if (error.code === 'AUTH_ERROR' || 
-              (error.statusCode && error.statusCode >= 400 && error.statusCode < 500 && error.statusCode !== 429)) {
+          if (error.code === 'AUTH_ERROR' ||
+            (error.statusCode && error.statusCode >= 400 && error.statusCode < 500 && error.statusCode !== 429)) {
             throw error;
           }
 
           // For rate limiting, wait for the specified time
           if (error.code === 'RATE_LIMIT' && error.statusCode) {
             const delay = error.statusCode;
-            this.logger?.warn(`[${this.name}] Rate limited, waiting ${delay}ms`);
+            this.logger?.warn(`[${ this.name }] Rate limited, waiting ${ delay }ms`);
             await this.sleep(delay);
             continue;
           }
@@ -146,7 +146,7 @@ export abstract class BaseClient implements PlatformClient {
 
         // Calculate exponential backoff delay
         const delay = baseDelay * Math.pow(2, attempt);
-        this.logger?.warn(`[${this.name}] Attempt ${attempt + 1} failed, retrying in ${delay}ms`);
+        this.logger?.warn(`[${ this.name }] Attempt ${ attempt + 1 } failed, retrying in ${ delay }ms`);
         await this.sleep(delay);
       }
     }
@@ -190,7 +190,7 @@ export abstract class BaseClient implements PlatformClient {
     if (url) {
       return url;
     }
-    
+
     // This would be set by the main SDK based on configuration
     return undefined;
   }

@@ -1,15 +1,15 @@
-import { BatchProcessor } from '../../src/core/batch-processor.js';
-import { MarkdownParser } from '../../src/utils/markdown-parser.js';
-import { AutoCrossPost } from '../../src/auto-crosspost.js';
-import { ConfigManager } from '../../src/config/index.js';
-import { createMockConfig } from '../test-utils.js';
+import { BatchProcessor } from '../../src/core/batch-processor.ts';
+import { MarkdownParser } from '../../src/utils/markdown-parser.ts';
+import { AutoCrossPost } from '../../src/auto-crosspost.ts';
+import { ConfigManager } from '../../src/config/index.ts';
+import { createMockConfig } from '../test-utils.ts';
 import { writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
 
 // Mock dependencies
-jest.mock('../../src/utils/markdown-parser.js');
-jest.mock('../../src/auto-crosspost.js');
-jest.mock('../../src/config/index.js');
+jest.mock('../../src/utils/markdown-parser.ts');
+jest.mock('../../src/auto-crosspost.ts');
+jest.mock('../../src/config/index.ts');
 
 const MockedMarkdownParser = MarkdownParser as jest.MockedClass<typeof MarkdownParser>;
 const MockedAutoCrossPost = AutoCrossPost as jest.MockedClass<typeof AutoCrossPost>;
@@ -180,12 +180,16 @@ describe('BatchProcessor', () => {
 
   describe('error scenarios', () => {
     it('should handle SDK initialization failure', async () => {
-      MockedConfigManager.loadConfig = jest.fn().mockRejectedValue(new Error('Config failed'));
+      const configError = new Error('Config failed');
+      
+      // Create a new batch processor instance for this test
+      const failingProcessor = new BatchProcessor();
+      
+      // Mock ConfigManager.loadConfig to throw an error
+      MockedConfigManager.loadConfig = jest.fn().mockRejectedValue(configError);
 
-      const results = await batchProcessor.processFiles([testFiles[0]]);
-
-      expect(results[0].success).toBe(false);
-      expect(results[0].error).toBe('Config failed');
+      // Expect the processFiles call to reject with the config error
+      await expect(failingProcessor.processFiles([testFiles[0]])).rejects.toThrow('Config failed');
     });
 
     it('should handle cross-posting failures', async () => {

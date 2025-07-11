@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander';
-import { resolve, join } from 'path';
-import { readdir } from 'fs/promises';
 import chalk from 'chalk';
-import { 
-  BatchProcessor, 
-  CrossPostQueue, 
-  FileWatcher, 
+import { Command } from 'commander';
+import { readdir } from 'fs/promises';
+import { join, resolve } from 'path';
+import {
+  BatchProcessor,
+  BatchProgressReporter,
+  CrossPostQueue,
   CrossPostScheduler,
-  BatchProgressReporter 
-} from '../core/index.js';
+  FileWatcher
+} from '../core/index.ts';
 
 const program = new Command();
 
@@ -32,7 +32,7 @@ program
   .action(async (directory: string, options: any) => {
     try {
       const absoluteDir = resolve(directory);
-      console.log(chalk.blue(`📁 Processing directory: ${absoluteDir}`));
+      console.log(chalk.blue(`📁 Processing directory: ${ absoluteDir }`));
 
       // Get files
       const allFiles = await readdir(absoluteDir);
@@ -46,11 +46,11 @@ program
         return;
       }
 
-      console.log(chalk.green(`Found ${markdownFiles.length} files`));
+      console.log(chalk.green(`Found ${ markdownFiles.length } files`));
 
       if (options.dryRun) {
         console.log(chalk.yellow('🔍 Dry run mode - showing files that would be processed:'));
-        markdownFiles.forEach(file => console.log(`  ${file}`));
+        markdownFiles.forEach(file => console.log(`  ${ file }`));
         return;
       }
 
@@ -76,7 +76,7 @@ program
       reporter.printFinalReport();
 
     } catch (error) {
-      console.error(chalk.red(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(chalk.red(`❌ Error: ${ error instanceof Error ? error.message : 'Unknown error' }`));
       process.exit(1);
     }
   });
@@ -92,7 +92,7 @@ program
   .action(async (directory: string, options: any) => {
     try {
       const absoluteDir = resolve(directory);
-      console.log(chalk.blue(`👀 Watching ${absoluteDir} for changes...`));
+      console.log(chalk.blue(`👀 Watching ${ absoluteDir } for changes...`));
 
       const watcher = new FileWatcher(absoluteDir, {
         ignoreInitial: options.ignoreInitial,
@@ -105,7 +105,7 @@ program
         const status = watcher.getQueueStatus();
         if (status.totalJobs > 0) {
           console.log(
-            chalk.cyan(`Queue status: ${status.processingJobs} processing, ${status.pendingJobs} pending`)
+            chalk.cyan(`Queue status: ${ status.processingJobs } processing, ${ status.pendingJobs } pending`)
           );
         }
       }, 10000);
@@ -119,10 +119,10 @@ program
       });
 
       // Keep the process alive
-      await new Promise(() => {});
+      await new Promise(() => { });
 
     } catch (error) {
-      console.error(chalk.red(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(chalk.red(`❌ Error: ${ error instanceof Error ? error.message : 'Unknown error' }`));
       process.exit(1);
     }
   });
@@ -153,21 +153,21 @@ program
 
       if (options.daily) {
         jobId = scheduler.scheduleDaily(options.daily, absoluteDir);
-        console.log(chalk.green(`📅 Scheduled daily processing at ${options.daily}`));
+        console.log(chalk.green(`📅 Scheduled daily processing at ${ options.daily }`));
       } else if (options.weekly !== undefined) {
         const day = parseInt(options.weekly);
         const time = options.weeklyTime;
         jobId = scheduler.scheduleWeekly(day, time, absoluteDir);
-        console.log(chalk.green(`📅 Scheduled weekly processing on day ${day} at ${time}`));
+        console.log(chalk.green(`📅 Scheduled weekly processing on day ${ day } at ${ time }`));
       } else if (options.cron) {
         jobId = scheduler.scheduleCustom(options.cron, absoluteDir, options.jobId);
-        console.log(chalk.green(`📅 Scheduled custom job: ${options.cron}`));
+        console.log(chalk.green(`📅 Scheduled custom job: ${ options.cron }`));
       } else {
         console.error(chalk.red('Please specify --daily, --weekly, or --cron option'));
         process.exit(1);
       }
 
-      console.log(chalk.blue(`Job ID: ${jobId}`));
+      console.log(chalk.blue(`Job ID: ${ jobId }`));
       console.log(chalk.green('Scheduler running... Press Ctrl+C to stop'));
 
       process.on('SIGINT', () => {
@@ -177,10 +177,10 @@ program
       });
 
       // Keep the process alive
-      await new Promise(() => {});
+      await new Promise(() => { });
 
     } catch (error) {
-      console.error(chalk.red(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(chalk.red(`❌ Error: ${ error instanceof Error ? error.message : 'Unknown error' }`));
       process.exit(1);
     }
   });
@@ -201,10 +201,10 @@ program
       if (options.status) {
         const status = queue.getStatus();
         console.log(chalk.blue('📊 Queue Status:'));
-        console.log(`Total Jobs: ${status.totalJobs}`);
-        console.log(`Pending: ${status.pendingJobs}`);
-        console.log(`Processing: ${status.processingJobs}`);
-        console.log(`Active: ${status.processing ? 'Yes' : 'No'}`);
+        console.log(`Total Jobs: ${ status.totalJobs }`);
+        console.log(`Pending: ${ status.pendingJobs }`);
+        console.log(`Processing: ${ status.processingJobs }`);
+        console.log(`Active: ${ status.processing ? 'Yes' : 'No' }`);
       }
 
       if (options.clear) {
@@ -213,7 +213,7 @@ program
       }
 
     } catch (error) {
-      console.error(chalk.red(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(chalk.red(`❌ Error: ${ error instanceof Error ? error.message : 'Unknown error' }`));
       process.exit(1);
     }
   });

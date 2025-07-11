@@ -1,7 +1,7 @@
 import * as chokidar from 'chokidar';
 import { join } from 'path';
-import { CrossPostQueue, QueueJobData } from './queue.js';
-import { MarkdownParser } from '../utils/markdown-parser.js';
+import { MarkdownParser } from '../utils/markdown-parser.ts';
+import { CrossPostQueue, QueueJobData } from './queue.ts';
 
 export interface WatcherOptions {
   concurrency?: number;
@@ -16,8 +16,8 @@ export class FileWatcher {
 
   constructor(directory: string, options: WatcherOptions = {}) {
     this.options = options;
-    this.queue = new CrossPostQueue({ 
-      concurrency: options.concurrency || 1 
+    this.queue = new CrossPostQueue({
+      concurrency: options.concurrency || 1
     });
 
     this.watcher = chokidar.watch(join(directory, '*.md'), {
@@ -30,12 +30,12 @@ export class FileWatcher {
 
   private setupEventHandlers() {
     this.watcher.on('add', (filePath: string) => {
-      console.log(`New file detected: ${filePath}`);
+      console.log(`New file detected: ${ filePath }`);
       this.processFile(filePath);
     });
 
     this.watcher.on('change', (filePath: string) => {
-      console.log(`File changed: ${filePath}`);
+      console.log(`File changed: ${ filePath }`);
       this.processFile(filePath);
     });
 
@@ -44,11 +44,11 @@ export class FileWatcher {
     });
 
     this.queue.on('jobCompleted', (job) => {
-      console.log(`✅ Auto-posted: ${job.data.post?.title || 'Unknown'}`);
+      console.log(`✅ Auto-posted: ${ job.data.post?.title || 'Unknown' }`);
     });
 
     this.queue.on('jobFailed', (job) => {
-      console.error(`❌ Auto-post failed: ${job.error}`);
+      console.error(`❌ Auto-post failed: ${ job.error }`);
     });
   }
 
@@ -58,13 +58,13 @@ export class FileWatcher {
 
       // Skip drafts if configured
       if (this.options.skipDrafts && !parsed.frontmatter.published) {
-        console.log(`Skipping draft: ${filePath}`);
+        console.log(`Skipping draft: ${ filePath }`);
         return;
       }
 
       // Only process published posts by default
       if (!parsed.frontmatter.published) {
-        console.log(`Skipping unpublished post: ${filePath}`);
+        console.log(`Skipping unpublished post: ${ filePath }`);
         return;
       }
 
@@ -84,7 +84,7 @@ export class FileWatcher {
       await this.queue.addJob(jobData);
 
     } catch (error) {
-      console.error(`Error processing ${filePath}:`, error instanceof Error ? error.message : 'Unknown error');
+      console.error(`Error processing ${ filePath }:`, error instanceof Error ? error.message : 'Unknown error');
     }
   }
 

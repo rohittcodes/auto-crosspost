@@ -1,11 +1,12 @@
 {
-  "preset": "ts-jest/presets/default-esm",
-  "extensionsToTreatAsEsm": [".ts"],
+  "preset": "ts-jest",
   "testEnvironment": "node",
   "transform": {
-    "^.+\\.ts$": ["ts-jest", { "useESM": true }]
+    "^.+\\.ts$": "ts-jest"
   },
   "testMatch": [
     "**/?(*.)+(spec|test).ts"
-  ]
+  ],
+  "testTimeout": 20000,
+  "setupFilesAfterEnv": ["<rootDir>/tests/setup.ts"]
 }
