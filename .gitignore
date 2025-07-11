@@ -141,3 +141,5 @@ test-coverage/
 # Generated documentation
 api-docs/
 typedoc-output/
+
+.docs/

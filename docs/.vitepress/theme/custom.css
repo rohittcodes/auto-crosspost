@@ -1,0 +1,49 @@
+/* Custom CSS for enhanced documentation */
+
+/* Analytics-related UI enhancements */
+.analytics-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+/* External link indicators */
+a[href^="http"]:not([href*="rohittcodes.github.io"]):not([href*="auto-crosspost"])::after {
+  content: " ↗";
+  opacity: 0.7;
+  font-size: 0.8em;
+}
+
+/* Highlight code blocks with better visibility */
+.language-bash .highlight-lines .highlighted {
+  background-color: rgba(0, 100, 0, 0.2);
+}
+
+/* Custom button styles for CTAs */
+.cta-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 768px) {
+  .analytics-banner {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+}

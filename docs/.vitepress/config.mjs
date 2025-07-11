@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { googleAnalytics } from './analytics.js'
 
 export default defineConfig({
   title: 'Auto-CrossPost SDK',
@@ -16,7 +17,15 @@ export default defineConfig({
     ['meta', { property: 'og:description', content: 'Automatically cross-post your blog content to multiple platforms' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'Auto-CrossPost SDK' }],
-    ['meta', { name: 'twitter:description', content: 'Automatically cross-post your blog content to multiple platforms' }]
+    ['meta', { name: 'twitter:description', content: 'Automatically cross-post your blog content to multiple platforms' }],
+    // Google Analytics 4
+    ['script', { async: '', src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalytics.measurementId}` }],
+    ['script', {}, `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${googleAnalytics.measurementId}', ${JSON.stringify(googleAnalytics.config)});
+    `]
   ],
 
   themeConfig: {
@@ -59,7 +68,8 @@ export default defineConfig({
           items: [
             { text: 'Custom Transformers', link: '/guide/advanced/transformers' },
             { text: 'Error Handling', link: '/guide/advanced/error-handling' },
-            { text: 'Batch Processing', link: '/guide/advanced/batch-processing' }
+            { text: 'Batch Processing', link: '/guide/advanced/batch-processing' },
+            { text: 'Troubleshooting', link: '/guide/troubleshooting' }
           ]
         }
       ],
