@@ -339,12 +339,12 @@ platforms:
   devto:
     apiKey: "your-devto-api-key"
     defaultTags: ["typescript", "nextjs"]
-  
+
   hashnode:
     token: "your-hashnode-token"
     publicationId: "your-publication-id"
     defaultTags: ["typescript", "nextjs"]
-  
+
 
 
 defaults:
@@ -552,10 +552,10 @@ export async function crossPostNewArticles() {
   const sdk = new CrossPostSDK({
     // configuration from environment variables
   });
-  
+
   // Find new articles since last sync
   const newArticles = await findNewArticles();
-  
+
   for (const article of newArticles) {
     await sdk.crossPost({
       filePath: article.path,
@@ -604,13 +604,13 @@ export default async function handler(req, res) {
   const sdk = new CrossPostSDK({
     // configuration
   });
-  
+
   // Cross-post new articles
   await sdk.crossPostBatch({
     directory: './content/blog/',
     platforms: ['devto', 'hashnode']
   });
-  
+
   res.status(200).json({ success: true });
 }
 ```
@@ -690,4 +690,4 @@ The phased approach ensures steady progress with clear deliverables at each stag
 **Timeline**: 5 weeks to production-ready SDK (reduced from 6 weeks due to removing Medium integration)
 **Team**: 1 developer (you)
 **Budget**: Open source, minimal costs
-**Risk Level**: Low to Medium (well-defined scope, proven technologies) 
+**Risk Level**: Low to Medium (well-defined scope, proven technologies)
