@@ -82,7 +82,6 @@ export default defineConfig({
           text: 'Examples',
           items: [
             { text: 'Overview', link: '/examples/' },
-            { text: 'Basic Usage', link: '/examples/basic' },
             { text: 'CLI Examples', link: '/examples/cli' },
             { text: 'Next.js Integration', link: '/examples/nextjs' },
             { text: 'Custom Workflows', link: '/examples/workflows' }
