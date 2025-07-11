@@ -1,62 +1,56 @@
-# Dependencies
-node_modules
+# Source code (not needed for docs deployment)
+src/
+dist/
+
+# Development and testing
+tests/
+coverage/
+.nyc_output/
+scripts/
+
+# Configuration files not needed for docs
+jest.config.json
+tsconfig.json
+tsconfig.build.json
+.eslintrc.*
+.gitignore
+
+# Examples and development files
+examples/
+
+# Environment files
+.env*
+!.env.example
+
+# IDE and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Build outputs (except docs dist)
-dist
-.next
-.nuxt
-out
+# Dependencies (will be installed fresh)
+node_modules/
 
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE files
-.vscode
-.idea
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Test files
-coverage
-.nyc_output
-
-# Logs
-logs
-*.log
-
-# Temporary files
-tmp
-temp
-
-# Git
-.git
-.gitignore
+# Git files
+.git/
 
 # CI/CD
-.github
+.github/
 
-# Development files
-src
-tests
-scripts
-examples
-jest.config.json
-tsconfig.json
-tsconfig.build.json
+# Temporary files
+tmp/
+temp/
 
-# Keep only docs and necessary config
-!docs
-!package.json
-!vercel.json
-!.vercelignore
+# Only keep what's needed for docs build:
+# - docs/ (source files)
+# - package.json (dependencies)
+# - vercel.json (deployment config)
