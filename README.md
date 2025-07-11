@@ -12,6 +12,10 @@ A TypeScript SDK for automatically cross-posting markdown/MDX blog posts to mult
 - 🎯 **TypeScript first**: Full type safety and IntelliSense support
 - 🧪 **Highly testable**: Modular architecture with dependency injection
 - 🛡️ **Error handling**: Robust error handling with custom error types
+- 📦 **Batch processing**: Process multiple posts with concurrency control
+- 👀 **File watching**: Automatically process new/changed posts
+- ⏰ **Scheduling**: Cron-based scheduling for recurring operations
+- 🎛️ **Queue management**: Advanced job queue with retry logic
 
 ## Installation
 
@@ -211,6 +215,106 @@ const posts = [post1, post2, post3];
 const results = await Promise.all(
   posts.map(post => sdk.crossPost(post))
 );
+```
+
+## Batch Processing
+
+For processing multiple posts at once:
+
+```typescript
+import { BatchProcessor, BatchProgressReporter } from 'auto-crosspost';
+
+// Create batch processor
+const processor = new BatchProcessor({
+  concurrency: 3,    // Process 3 files simultaneously
+  delay: 1000,       // Wait 1 second between requests
+  skipDrafts: true   // Skip unpublished posts
+});
+
+// Process multiple files
+const files = ['post1.md', 'post2.md', 'post3.md'];
+const results = await processor.processFiles(files);
+
+// Track progress
+const reporter = new BatchProgressReporter(files.length);
+results.forEach(result => reporter.reportProgress(result));
+reporter.printFinalReport();
+```
+
+### File Watching
+
+Automatically process posts when files change:
+
+```typescript
+import { FileWatcher } from 'auto-crosspost';
+
+const watcher = new FileWatcher('./posts', {
+  ignoreInitial: false,  // Process existing files on startup
+  skipDrafts: true,      // Skip draft posts
+  concurrency: 2         // Process 2 files at once
+});
+
+// Watcher will automatically queue and process new/changed posts
+console.log('Watching for file changes...');
+```
+
+### Scheduling
+
+Schedule recurring batch operations:
+
+```typescript
+import { CrossPostScheduler } from 'auto-crosspost';
+
+const scheduler = new CrossPostScheduler({
+  batchOptions: {
+    concurrency: 2,
+    delay: 2000,
+    skipDrafts: true
+  }
+});
+
+// Schedule daily at 9:00 AM
+scheduler.scheduleDaily('09:00', './posts');
+
+// Schedule weekly on Monday at 10:00 AM
+scheduler.scheduleWeekly(1, '10:00', './posts');
+
+// Custom cron expression
+scheduler.scheduleCustom('0 */6 * * *', './posts'); // Every 6 hours
+```
+
+### Queue Management
+
+Use the job queue for complex workflows:
+
+```typescript
+import { CrossPostQueue } from 'auto-crosspost';
+
+const queue = new CrossPostQueue({ concurrency: 5 });
+
+// Listen for events
+queue.on('jobCompleted', (job) => {
+  console.log(`✅ Job completed: ${job.id}`);
+});
+
+queue.on('jobFailed', (job) => {
+  console.log(`❌ Job failed: ${job.error}`);
+});
+
+// Add jobs
+await queue.addJob({
+  type: 'crosspost',
+  post: {
+    title: 'My Post',
+    content: 'Post content...',
+    tags: ['demo'],
+    publishStatus: 'published'
+  }
+});
+
+// Monitor status
+const status = queue.getStatus();
+console.log(`Processing: ${status.processingJobs}, Pending: ${status.pendingJobs}`);
 ```
 
 ## Contributing

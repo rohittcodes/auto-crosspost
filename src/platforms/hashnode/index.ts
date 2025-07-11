@@ -1,5 +1,5 @@
-export { HashnodeClient } from './hashnode-client';
-export { HashnodeApi } from './hashnode-api';
-export { HashnodeTransformer } from './hashnode-transformer';
-export { HashnodeErrorHandler } from './hashnode-error-handler';
-export * from './types';
+export { HashnodeClient } from './hashnode-client.js';
+export { HashnodeApi } from './hashnode-api.js';
+export { HashnodeTransformer } from './hashnode-transformer.js';
+export { HashnodeErrorHandler } from './hashnode-error-handler.js';
+export * from './types.js';

@@ -4,7 +4,7 @@ import {
   HashnodeArticle,
   HashnodePublication,
   HashnodeUser
-} from './types';
+} from './types.js';
 
 /**
  * Low-level API interface for Hashnode GraphQL operations

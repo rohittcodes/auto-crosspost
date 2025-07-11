@@ -1,15 +1,20 @@
 // Main SDK exports
-export { AutoCrossPost } from './auto-crosspost';
+export { AutoCrossPost } from './auto-crosspost.js';
 
 // Core types and interfaces
-export * from './core/types';
+export * from './core/types.js';
+
+// Batch processing services
+export {
+  BatchProcessor, BatchProgressReporter, CrossPostQueue, CrossPostScheduler, FileWatcher
+} from './core/index.js';
 
 // Platform clients
-export * from './platforms';
+export * from './platforms/index.js';
 
 // Utilities
-export { MarkdownParser } from './utils/markdown-parser';
-export { ConfigManager } from './config';
+export { ConfigManager } from './config/index.js';
+export { MarkdownParser } from './utils/markdown-parser.js';
 
 // Version info
 export const VERSION = '0.1.0';

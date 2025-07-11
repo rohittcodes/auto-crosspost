@@ -1,7 +1,7 @@
 import { readFile, writeFile, access } from 'fs/promises';
 import { join, dirname } from 'path';
 import { homedir } from 'os';
-import { CrossPostConfig } from '../core/types';
+import { CrossPostConfig } from '../core/types.js';
 
 /**
  * Configuration manager for Auto-CrossPost SDK
