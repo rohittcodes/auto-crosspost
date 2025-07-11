@@ -71,7 +71,7 @@ jobs:
           for file in ${{ steps.changed-files.outputs.files }}; do
             if [ -f "$file" ]; then
               echo "📝 Cross-posting: $file"
-              if crosspost post "$file" --config crosspost.config.json; then
+              if auto-crosspost post "$file" --config crosspost.config.json; then
                 echo "✅ Successfully cross-posted: $file"
               else
                 echo "❌ Failed to cross-post: $file"

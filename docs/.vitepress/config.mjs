@@ -55,6 +55,7 @@ export default defineConfig({
           items: [
             { text: 'SDK Usage', link: '/guide/usage/sdk' },
             { text: 'CLI Usage', link: '/guide/cli' },
+            { text: 'GitHub Actions', link: '/guide/github-actions' },
             { text: 'Next.js Integration', link: '/guide/usage/nextjs' },
             { text: 'Deployment', link: '/guide/deployment' }
           ]
@@ -87,6 +88,7 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/examples/' },
             { text: 'CLI Examples', link: '/examples/cli' },
+            { text: 'GitHub Actions', link: '/examples/github-actions' },
             { text: 'Next.js Integration', link: '/examples/nextjs' },
             { text: 'Custom Workflows', link: '/examples/workflows' }
           ]

@@ -71,23 +71,62 @@ console.log(`Posted to ${result.successful} platforms successfully!`);
 
 Generate a configuration file:
 ```bash
-npx crosspost config
+npx auto-crosspost config
 ```
 
 Cross-post a markdown file:
 ```bash
-npx crosspost post ./my-blog-post.md
+npx auto-crosspost post ./my-blog-post.md
 ```
 
 Test platform authentication:
 ```bash
-npx crosspost test
+npx auto-crosspost test
 ```
 
 List posts from a platform:
 ```bash
-npx crosspost list devto --limit 5
+npx auto-crosspost list devto --limit 5
 ```
+
+### 4. GitHub Actions Integration
+
+Automate your cross-posting with GitHub Actions. Add this workflow to `.github/workflows/crosspost.yml`:
+
+```yaml
+name: Auto CrossPost
+
+on:
+  push:
+    branches: [main]
+    paths: ['posts/**/*.md']
+
+jobs:
+  crosspost:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm install -g auto-crosspost
+      - name: Cross-post changed files
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          HASHNODE_ACCESS_TOKEN: ${{ secrets.HASHNODE_ACCESS_TOKEN }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+        run: |
+          echo '{"platforms":{"devto":{"apiKey":"'$DEVTO_API_KEY'"},"hashnode":{"accessToken":"'$HASHNODE_ACCESS_TOKEN'","publicationId":"'$HASHNODE_PUBLICATION_ID'"}}}' > config.json
+          git diff --name-only HEAD~1 HEAD -- '*.md' | xargs -I {} auto-crosspost post "{}" --config config.json
+```
+
+Generate workflows with the built-in generator:
+```bash
+npx auto-crosspost github-actions generate basic
+npx auto-crosspost github-actions validate workflow .github/workflows/crosspost.yml
+```
+
+See our [GitHub Actions Examples](./examples/github-actions/) for more advanced workflows.
 
 ## API Reference
 

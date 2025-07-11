@@ -119,7 +119,7 @@ jobs:
         if: github.event.inputs.dry_run == 'true'
         run: |
           echo "🧪 Performing dry run..."
-          crosspost batch "${{ steps.setup.outputs.directory }}" \
+          auto-crosspost batch "${{ steps.setup.outputs.directory }}" \
             --config crosspost.config.json \
             --dry-run
 
@@ -132,7 +132,7 @@ jobs:
           LOG_FILE="crosspost-$(date +%Y%m%d-%H%M%S).log"
 
           # Run batch command with output logging
-          if crosspost batch "${{ steps.setup.outputs.directory }}" \
+          if auto-crosspost batch "${{ steps.setup.outputs.directory }}" \
             --config crosspost.config.json 2>&1 | tee "$LOG_FILE"; then
             echo "✅ Batch processing completed successfully"
           else

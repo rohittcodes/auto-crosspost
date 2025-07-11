@@ -92,7 +92,7 @@ jobs:
       - name: Cross-post changed files
         run: |
           git diff --name-only HEAD~1 HEAD -- '*.md' '**/*.md' | while read file; do
-            [ -f "$file" ] && crosspost post "$file" --config config.json
+            [ -f "$file" ] && auto-crosspost post "$file" --config config.json
           done
 ```
 
@@ -162,7 +162,7 @@ jobs:
               fs.writeFileSync('config.json', JSON.stringify(config));
               
               return new Promise((resolve, reject) => {
-                exec(`crosspost post "${file}" --config config.json`, (error, stdout) => {
+                exec(`auto-crosspost post "${file}" --config config.json`, (error, stdout) => {
                   if (error) reject(error);
                   else { console.log(stdout); resolve(); }
                 });
@@ -235,7 +235,7 @@ jobs:
           }
           EOF
           
-          crosspost batch posts/ --config config.json
+          auto-crosspost batch posts/ --config config.json
 ```
 
 **Best for:** Large content libraries, rate limit management, scheduled publishing
@@ -328,7 +328,7 @@ jobs:
           # Process changed files in this directory
           git diff --name-only HEAD~1 HEAD -- '${{ matrix.directory }}/**/*.md' | \
             sed 's|^${{ matrix.directory }}/||' | \
-            xargs -I {} crosspost post "{}" --config config.json
+            xargs -I {} auto-crosspost post "{}" --config config.json
 ```
 
 **Best for:** Multi-brand companies, documentation sites, team blogs
@@ -387,7 +387,7 @@ jobs:
           RESULTS=""
           
           git diff --name-only HEAD~1 HEAD -- '*.md' '**/*.md' | while read file; do
-            if [ -f "$file" ] && crosspost post "$file" --config config.json; then
+            if [ -f "$file" ] && auto-crosspost post "$file" --config config.json; then
               SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
               RESULTS="$RESULTS✅ $file\n"
             else
@@ -467,7 +467,7 @@ jobs:
         run: |
           echo '{"platforms":{"devto":{"apiKey":"'$DEVTO_API_KEY'"}}}' > config.json
           git diff --name-only HEAD~1 HEAD -- '*.md' '**/*.md' | \
-            xargs -I {} crosspost post "{}" --config config.json --platform devto
+            xargs -I {} auto-crosspost post "{}" --config config.json --platform devto
 ```
 
 ### Hashnode Only
@@ -510,7 +510,7 @@ jobs:
           EOF
           
           git diff --name-only HEAD~1 HEAD -- '*.md' '**/*.md' | \
-            xargs -I {} crosspost post "{}" --config config.json --platform hashnode
+            xargs -I {} auto-crosspost post "{}" --config config.json --platform hashnode
 ```
 
 ## Testing and Validation
@@ -539,7 +539,7 @@ jobs:
         run: |
           echo '{"platforms":{"devto":{"apiKey":"test"}}}' > config.json
           git diff --name-only origin/main HEAD -- '*.md' '**/*.md' | \
-            xargs -I {} crosspost post "{}" --config config.json --dry-run
+            xargs -I {} auto-crosspost post "{}" --config config.json --dry-run
 ```
 
 ### Workflow Validation

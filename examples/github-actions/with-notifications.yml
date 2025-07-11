@@ -127,7 +127,7 @@ jobs:
             if [ -f "$file" ]; then
               echo "📝 Processing: $file"
 
-              if crosspost post "$file" --config crosspost.config.json; then
+              if auto-crosspost post "$file" --config crosspost.config.json; then
                 echo "✅ Success: $file"
                 SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
                 RESULTS="$RESULTS✅ $file\n"

@@ -1,13 +1,13 @@
 {
   "name": "auto-crosspost",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "TypeScript SDK for automatically cross-posting markdown/MDX blog posts to multiple platforms",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "crosspost": "./dist/cli/index.js",
-    "crosspost-batch": "./dist/cli/batch.js"
+    "auto-crosspost": "./dist/cli/index.js",
+    "auto-crosspost-batch": "./dist/cli/batch.js"
   },
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json && npm run post-build",

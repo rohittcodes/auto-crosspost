@@ -29,7 +29,7 @@ jobs:
       
       - name: Cross-post new articles
         run: |
-          npx crosspost-batch ./content/posts/ \
+          npx auto-crosspost-batch ./content/posts/ \
             --devto-api-key "${{ secrets.DEVTO_API_KEY }}" \
             --hashnode-token "${{ secrets.HASHNODE_TOKEN }}"
 ```
@@ -83,7 +83,7 @@ export async function handleCMSWebhook(data: CMSWebhookData) {
 # Check for new markdown files
 git diff --name-only HEAD~1 HEAD | grep '\.md$' | while read file; do
   if [ -f "$file" ]; then
-    npx crosspost post "$file"
+    npx auto-crosspost post "$file"
   fi
 done
 ```

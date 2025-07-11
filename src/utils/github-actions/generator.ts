@@ -220,7 +220,7 @@ ${ steps.map(step => this.indentStep(step)).join('\n\n') }
     for file in \${{ steps.changed-files.outputs.files }}; do
       if [ -f "$file" ]; then
         echo "📝 Cross-posting: $file"
-        crosspost post "$file" --config crosspost.config.json
+        auto-crosspost post "$file" --config crosspost.config.json
       fi
     done`
     ];
@@ -246,7 +246,7 @@ ${ steps.map(step => this.indentStep(step)).join('\n\n') }
         const { promisify } = require('util');
         const execAsync = promisify(exec);
 
-        await execAsync(\`crosspost post "\${filePath}" --config crosspost.config.json\`);
+        await execAsync(\`auto-crosspost post "\${filePath}" --config crosspost.config.json\`);
       }
     }
 
@@ -269,7 +269,7 @@ ${ steps.map(step => this.indentStep(step)).join('\n\n') }
     for dir in ${ config.directories.join(' ') }; do
       if [ -d "$dir" ]; then
         echo "📁 Processing directory: $dir"
-        crosspost batch "$dir" --config crosspost.config.json
+        auto-crosspost batch "$dir" --config crosspost.config.json
       fi
     done`
     ];

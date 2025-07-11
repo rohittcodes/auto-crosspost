@@ -31,6 +31,7 @@ Built with TypeScript for excellent developer experience:
 ### 🛠️ **Flexible Usage**
 - **CLI Tool** - Command-line interface for quick posting
 - **SDK** - Programmatic integration into your workflow
+- **GitHub Actions** - Automated CI/CD integration
 - **Next.js Integration** - Built-in support for Next.js projects
 
 ### 🔄 **Batch Processing**

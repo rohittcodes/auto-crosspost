@@ -957,7 +957,7 @@ import { Command } from 'commander'
 const program = new Command()
 
 program
-  .name('crosspost-batch')
+  .name('auto-crosspost-batch')
   .description('Batch cross-posting utilities')
   .version('1.0.0')
 

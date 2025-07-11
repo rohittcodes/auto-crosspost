@@ -14,7 +14,7 @@ Or use locally in your project:
 
 ```bash
 npm install auto-crosspost
-npx crosspost --help
+npx auto-crosspost --help
 ```
 
 ## Commands Overview
@@ -22,17 +22,17 @@ npx crosspost --help
 The CLI provides several commands for managing your cross-posting workflow:
 
 ```bash
-crosspost <command> [options]
+auto-crosspost <command> [options]
 
 Commands:
-  crosspost post <file>      Post a single markdown file
-  crosspost batch <dir>      Post multiple files from directory
-  crosspost update <id>      Update an existing post
-  crosspost delete <id>      Delete a post from platforms
-  crosspost status           Check posting status and statistics
-  crosspost sync             Sync posts across platforms
-  crosspost init             Initialize configuration
-  crosspost validate         Validate configuration and setup
+  auto-crosspost post <file>      Post a single markdown file
+  auto-crosspost batch <dir>      Post multiple files from directory
+  auto-crosspost update <id>      Update an existing post
+  auto-crosspost delete <id>      Delete a post from platforms
+  auto-crosspost status           Check posting status and statistics
+  auto-crosspost sync             Sync posts across platforms
+  auto-crosspost init             Initialize configuration
+  auto-crosspost validate         Validate configuration and setup
 
 Options:
   -c, --config <file>        Configuration file path
@@ -50,16 +50,16 @@ Post a single markdown file to configured platforms.
 
 ```bash
 # Post to all configured platforms
-crosspost post ./posts/my-article.md
+auto-crosspost post ./posts/my-article.md
 
 # Post to specific platforms
-crosspost post ./posts/my-article.md --platforms devto,hashnode
+auto-crosspost post ./posts/my-article.md --platforms devto,hashnode
 
 # Save as draft
-crosspost post ./posts/my-article.md --draft
+auto-crosspost post ./posts/my-article.md --draft
 
 # Use custom config
-crosspost post ./posts/my-article.md --config ./my-config.json
+auto-crosspost post ./posts/my-article.md --config ./my-config.json
 ```
 
 ### Options
@@ -79,13 +79,13 @@ Options:
 
 ```bash
 # Post with specific tags
-crosspost post ./posts/tutorial.md --tags "javascript,tutorial,beginners"
+auto-crosspost post ./posts/tutorial.md --tags "javascript,tutorial,beginners"
 
 # Watch mode for development
-crosspost post ./posts/draft.md --draft --watch
+auto-crosspost post ./posts/draft.md --draft --watch
 
 # Force repost with custom config
-crosspost post ./posts/updated.md --force --config ./production.config.json
+auto-crosspost post ./posts/updated.md --force --config ./production.config.json
 ```
 
 ## Batch Command
@@ -96,13 +96,13 @@ Post multiple markdown files from a directory.
 
 ```bash
 # Post all markdown files in directory
-crosspost batch ./posts
+auto-crosspost batch ./posts
 
 # Post with filtering
-crosspost batch ./posts --pattern "*.tutorial.md"
+auto-crosspost batch ./posts --pattern "*.tutorial.md"
 
 # Dry run to see what would be posted
-crosspost batch ./posts --dry-run
+auto-crosspost batch ./posts --dry-run
 ```
 
 ### Options
@@ -124,16 +124,16 @@ Options:
 
 ```bash
 # Process all markdown files recursively
-crosspost batch ./content --recursive --pattern "**/*.md"
+auto-crosspost batch ./content --recursive --pattern "**/*.md"
 
 # Limited parallel processing with delay
-crosspost batch ./posts --parallel 2 --delay 2000
+auto-crosspost batch ./posts --parallel 2 --delay 2000
 
 # Watch mode for continuous publishing
-crosspost batch ./posts --watch --draft
+auto-crosspost batch ./posts --watch --draft
 
 # Sort by date and limit to 10 files
-crosspost batch ./posts --sort date --limit 10
+auto-crosspost batch ./posts --sort date --limit 10
 ```
 
 ## Update Command
@@ -144,13 +144,13 @@ Update existing posts on platforms.
 
 ```bash
 # Update specific post
-crosspost update devto:123456 ./posts/updated-article.md
+auto-crosspost update devto:123456 ./posts/updated-article.md
 
 # Update across all platforms
-crosspost update all:my-slug ./posts/updated-article.md
+auto-crosspost update all:my-slug ./posts/updated-article.md
 
 # Update metadata only
-crosspost update hashnode:abc123 --title "New Title" --tags "updated,tags"
+auto-crosspost update hashnode:abc123 --title "New Title" --tags "updated,tags"
 ```
 
 ### Platform ID Formats
@@ -186,13 +186,13 @@ Delete posts from platforms.
 
 ```bash
 # Delete from specific platform
-crosspost delete devto:123456
+auto-crosspost delete devto:123456
 
 # Delete from all platforms
-crosspost delete all:my-article-slug
+auto-crosspost delete all:my-article-slug
 
 # Confirm before deletion
-crosspost delete hashnode:abc123 --confirm
+auto-crosspost delete hashnode:abc123 --confirm
 ```
 
 ### Options
@@ -212,13 +212,13 @@ Check the status of your posts and platform connections.
 
 ```bash
 # Show overall status
-crosspost status
+auto-crosspost status
 
 # Show detailed statistics
-crosspost status --detailed
+auto-crosspost status --detailed
 
 # Check specific platforms
-crosspost status --platforms devto
+auto-crosspost status --platforms devto
 ```
 
 ### Sample Output
@@ -263,13 +263,13 @@ Synchronize posts across platforms to ensure consistency.
 
 ```bash
 # Sync all posts
-crosspost sync
+auto-crosspost sync
 
 # Sync specific platform
-crosspost sync --platform devto
+auto-crosspost sync --platform devto
 
 # Dry run to see what would be synced
-crosspost sync --dry-run
+auto-crosspost sync --dry-run
 ```
 
 ### Sync Operations
@@ -298,13 +298,13 @@ Initialize configuration and set up your workspace.
 
 ```bash
 # Interactive setup
-crosspost init
+auto-crosspost init
 
 # Quick setup with defaults
-crosspost init --quick
+auto-crosspost init --quick
 
 # Setup for specific platforms
-crosspost init --platforms devto,hashnode
+auto-crosspost init --platforms devto,hashnode
 ```
 
 ### Interactive Setup
@@ -347,12 +347,12 @@ Validate your configuration and platform connections.
 
 ```bash
 # Validate everything
-crosspost validate
+auto-crosspost validate
 
 # Validate specific aspects
-crosspost validate --config
-crosspost validate --platforms
-crosspost validate --files
+auto-crosspost validate --config
+auto-crosspost validate --platforms
+auto-crosspost validate --files
 ```
 
 ### Validation Checks
@@ -530,18 +530,19 @@ Error: Rate limit exceeded
 Enable detailed logging:
 
 ```bash
-crosspost post ./article.md --verbose --log-level debug
+auto-crosspost post ./article.md --verbose --log-level debug
 ```
 
 ### Get Help
 
 ```bash
 # General help
-crosspost --help
+auto-crosspost --help
 
 # Command-specific help
-crosspost post --help
-crosspost batch --help
+auto-crosspost post --help
+auto-crosspost batch --help
+```
 
 # Version information
 crosspost --version

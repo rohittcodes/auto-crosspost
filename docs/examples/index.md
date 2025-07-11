@@ -446,144 +446,15 @@ export default function CrossPostPage() {
 }
 ```
 
-### 3. GitHub Actions Workflow
+### 3. GitHub Actions Automation
 
-Automate cross-posting with GitHub Actions:
+See our comprehensive [GitHub Actions Examples](/examples/github-actions) page for complete CI/CD integration examples, including:
 
-```yaml
-# .github/workflows/crosspost.yml
-name: Cross-post Blog Articles
-
-on:
-  push:
-    branches: [main]
-    paths: ['posts/**/*.md']
-  
-  # Allow manual triggering
-  workflow_dispatch:
-    inputs:
-      force:
-        description: 'Force repost all articles'
-        type: boolean
-        default: false
-
-jobs:
-  crosspost:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          # Fetch full history to detect new/changed files
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Auto-CrossPost SDK
-        run: npm install auto-crosspost
-
-      - name: Detect changed files
-        id: changes
-        run: |
-          if [ "${{ github.event.inputs.force }}" = "true" ]; then
-            echo "files=$(find posts -name '*.md' | tr '\n' ' ')" >> $GITHUB_OUTPUT
-          else
-            echo "files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^posts/.*\.md$' | tr '\n' ' ')" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Cross-post articles
-        if: steps.changes.outputs.files != ''
-        env:
-          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
-          HASHNODE_TOKEN: ${{ secrets.HASHNODE_TOKEN }}
-          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
-        run: |
-          cat > crosspost-action.js << 'EOF'
-          const { CrossPostSDK, MarkdownParser, ConfigManager } = require('auto-crosspost');
-          const fs = require('fs').promises;
-          
-          async function main() {
-            const files = process.argv[2].split(' ').filter(Boolean);
-            console.log(`Processing ${files.length} files:`, files);
-            
-            if (files.length === 0) {
-              console.log('No files to process');
-              return;
-            }
-            
-            const config = await ConfigManager.loadConfig();
-            const sdk = new CrossPostSDK(config);
-            const parser = new MarkdownParser();
-            
-            for (const file of files) {
-              console.log(`\nProcessing: ${file}`);
-              
-              try {
-                const parsed = await parser.parseFile(file);
-                
-                if (!parsed.frontmatter.title) {
-                  console.log('⚠️  Skipping: No title');
-                  continue;
-                }
-                
-                const post = {
-                  title: parsed.frontmatter.title,
-                  content: parsed.content,
-                  tags: parsed.frontmatter.tags || [],
-                  publishStatus: parsed.frontmatter.published ? 'published' : 'draft'
-                };
-                
-                const results = await sdk.postToAll(post);
-                
-                results.forEach(result => {
-                  const status = result.success ? '✅' : '❌';
-                  console.log(`${status} ${result.platform}: ${result.success ? 'Posted' : result.error?.message}`);
-                });
-                
-                // Wait between posts
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-              } catch (error) {
-                console.error(`❌ Error processing ${file}:`, error.message);
-              }
-            }
-          }
-          
-          main().catch(console.error);
-          EOF
-          
-          node crosspost-action.js "${{ steps.changes.outputs.files }}"
-
-      - name: Comment on PR
-        if: github.event_name == 'pull_request' && steps.changes.outputs.files != ''
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const files = '${{ steps.changes.outputs.files }}'.split(' ').filter(Boolean);
-            
-            const comment = `## 📝 Cross-post Results
-            
-            Processed ${files.length} markdown file(s):
-            
-            ${files.map(file => `- \`${file}\``).join('\n')}
-            
-            Check the [action logs](${context.payload.repository.html_url}/actions/runs/${context.runId}) for detailed results.`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-```
+- **Basic Workflow** - Automatic cross-posting on git push
+- **Conditional Publishing** - Smart posting based on frontmatter
+- **Batch Processing** - Scheduled bulk operations
+- **Monorepo Support** - Multi-project repository handling
+- **Notification Integration** - Slack/Discord alerts
 
 ### 4. Express.js Webhook Handler
 

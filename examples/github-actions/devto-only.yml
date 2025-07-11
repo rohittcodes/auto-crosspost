@@ -72,7 +72,7 @@ jobs:
             if [ -f "$file" ]; then
               echo "📝 Cross-posting to Dev.to: $file"
               
-              if crosspost post "$file" --config crosspost.config.json --platform devto; then
+              if auto-crosspost post "$file" --config crosspost.config.json --platform devto; then
                 echo "✅ Successfully posted to Dev.to: $file"
               else
                 echo "❌ Failed to post to Dev.to: $file"

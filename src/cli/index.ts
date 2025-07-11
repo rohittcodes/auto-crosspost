@@ -272,7 +272,7 @@ githubActionsCmd
         case 'workflow':
           if (!file) {
             console.log(chalk.red('❌ Workflow file path required'));
-            console.log('Usage: crosspost github-actions validate workflow <file>');
+            console.log('Usage: auto-crosspost github-actions validate workflow <file>');
             process.exit(1);
           }
           
@@ -365,13 +365,13 @@ async function loadConfig(configPath: string): Promise<CrossPostConfig> {
 
     // Validate required configuration
     if (!config.platforms || Object.keys(config.platforms).length === 0) {
-      throw new Error('No platforms configured. Run "crosspost config" to generate a sample configuration.');
+      throw new Error('No platforms configured. Run "auto-crosspost config" to generate a sample configuration.');
     }
 
     return config;
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-      throw new Error(`Configuration file not found: ${ configPath }. Run "crosspost config" to generate one.`);
+      throw new Error(`Configuration file not found: ${ configPath }. Run "auto-crosspost config" to generate one.`);
     }
     throw error;
   }

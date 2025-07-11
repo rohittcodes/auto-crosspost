@@ -91,7 +91,7 @@ jobs:
 
                 try {
                   const { stdout, stderr } = await execAsync(
-                    `crosspost post "${filePath}" --config crosspost.config.json`
+                    `auto-crosspost post "${filePath}" --config crosspost.config.json`
                   );
                   console.log(`✅ Successfully cross-posted: ${filePath}`);
                   if (stdout) console.log(stdout);

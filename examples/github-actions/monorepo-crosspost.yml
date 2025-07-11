@@ -193,7 +193,7 @@ jobs:
             if [ -f "$RELATIVE_FILE" ]; then
               echo "📝 Cross-posting: $RELATIVE_FILE"
               
-              if crosspost post "$RELATIVE_FILE" --config "${{ matrix.config }}"; then
+              if auto-crosspost post "$RELATIVE_FILE" --config "${{ matrix.config }}"; then
                 echo "✅ Successfully posted: $RELATIVE_FILE"
               else
                 echo "❌ Failed to post: $RELATIVE_FILE"

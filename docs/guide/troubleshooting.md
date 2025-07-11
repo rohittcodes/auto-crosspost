@@ -110,5 +110,5 @@ const crosspost = new AutoCrosspost({
 Or via CLI:
 
 ```bash
-crosspost post article.md --debug
+auto-crosspost post article.md --debug
 ```
