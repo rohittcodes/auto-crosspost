@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress'
-import { googleAnalytics } from './analytics.js'
 
 export default defineConfig({
   title: 'Auto-CrossPost SDK',
@@ -17,15 +16,7 @@ export default defineConfig({
     ['meta', { property: 'og:description', content: 'Automatically cross-post your blog content to multiple platforms' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'Auto-CrossPost SDK' }],
-    ['meta', { name: 'twitter:description', content: 'Automatically cross-post your blog content to multiple platforms' }],
-    // Google Analytics 4
-    ['script', { async: '', src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalytics.measurementId}` }],
-    ['script', {}, `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '${googleAnalytics.measurementId}', ${JSON.stringify(googleAnalytics.config)});
-    `]
+    ['meta', { name: 'twitter:description', content: 'Automatically cross-post your blog content to multiple platforms' }]
   ],
 
   themeConfig: {
@@ -60,7 +51,8 @@ export default defineConfig({
           items: [
             { text: 'SDK Usage', link: '/guide/usage/sdk' },
             { text: 'CLI Usage', link: '/guide/cli' },
-            { text: 'Next.js Integration', link: '/guide/usage/nextjs' }
+            { text: 'Next.js Integration', link: '/guide/usage/nextjs' },
+            { text: 'Deployment', link: '/guide/deployment' }
           ]
         },
         {
