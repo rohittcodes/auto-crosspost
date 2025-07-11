@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Auto-CrossPost SDK',
   description: 'Automatically cross-post your blog content to multiple platforms',
-  base: '/auto-crosspost/', // GitHub Pages base path
+  // Removed base path for Vercel deployment (serves from root)
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],
