@@ -1,2 +1,2 @@
-export { ConfigManager } from './config-manager.ts';
+export { ConfigManager } from './config-manager';
 

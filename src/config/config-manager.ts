@@ -1,7 +1,7 @@
 import { access, readFile, writeFile } from 'fs/promises';
 import { homedir } from 'os';
 import { dirname, join } from 'path';
-import { CrossPostConfig } from '../core/types.ts';
+import { CrossPostConfig } from '../core/types';
 
 /**
  * Configuration manager for Auto-CrossPost SDK
@@ -32,18 +32,13 @@ export class ConfigManager {
   ): Promise<CrossPostConfig> {
     let config: Partial<CrossPostConfig> = {};
 
-    // 1. Start with default configuration
     config = this.getDefaultConfig();
-
-    // 2. Load from global config file
     try {
       const globalConfig = await this.loadConfigFile(this.GLOBAL_CONFIG_PATH);
       config = { ...config, ...globalConfig };
     } catch (error) {
-      // Global config is optional
     }
 
-    // 3. Load from local config file
     if (configPath) {
       const localConfig = await this.loadConfigFile(configPath);
       config = { ...config, ...localConfig };
@@ -60,16 +55,13 @@ export class ConfigManager {
       }
     }
 
-    // 4. Apply environment variables
     const envConfig = this.loadFromEnvironment();
     config = { ...config, ...envConfig };
 
-    // 5. Apply explicit configuration (highest precedence)
     if (explicitConfig) {
       config = { ...config, ...explicitConfig };
     }
 
-    // Validate the final configuration
     this.validateConfig(config as CrossPostConfig);
 
     return config as CrossPostConfig;

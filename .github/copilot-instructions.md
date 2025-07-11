@@ -56,7 +56,7 @@ auto-crosspost/
 ```typescript
 // ✅ Good: Small, focused files
 // platforms/devto/devto-client.ts (<200 lines)
-// platforms/devto/devto-api.ts (<150 lines) 
+// platforms/devto/devto-api.ts (<150 lines)
 // platforms/devto/devto-transformer.ts (<150 lines)
 
 // ❌ Avoid: Large monolithic files
@@ -215,7 +215,6 @@ Add these scripts to package.json for monitoring:
   "scripts": {
     "check-file-sizes": "find src -name '*.ts' -exec wc -l {} + | sort -nr | head -20",
     "lint-file-size": "eslint src --rule 'max-lines: [error, 400]'",
-    "modularity-check": "node scripts/check-modularity.js"
   }
 }
 ```

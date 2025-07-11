@@ -1,15 +1,15 @@
-import { BaseClient } from '../../core/base-client.ts';
+import { BaseClient } from '../../core/base-client';
 import {
   ListPostsOptions,
   PlatformClient,
   PlatformPost,
   Post,
   ValidationError
-} from '../../core/types.ts';
-import { HashnodeApi } from './hashnode-api.ts';
-import { HashnodeErrorHandler } from './hashnode-error-handler.ts';
-import { HashnodeTransformer } from './hashnode-transformer.ts';
-import { HashnodeConfig } from './types.ts';
+} from '../../core/types';
+import { HashnodeApi } from './hashnode-api';
+import { HashnodeErrorHandler } from './hashnode-error-handler';
+import { HashnodeTransformer } from './hashnode-transformer';
+import { HashnodeConfig } from './types';
 
 /**
  * Hashnode platform client

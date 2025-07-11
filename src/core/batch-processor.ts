@@ -1,7 +1,7 @@
-import { AutoCrossPost } from '../auto-crosspost.ts';
-import { ConfigManager } from '../config/index.ts';
-import { MarkdownParser } from '../utils/markdown-parser.ts';
-import { CrossPostResult, Post } from './types.ts';
+import { AutoCrossPost } from '../auto-crosspost';
+import { ConfigManager } from '../config/index';
+import { MarkdownParser } from '../utils/markdown-parser';
+import { CrossPostResult, Post } from './types';
 
 // Simple concurrency control without p-limit
 class ConcurrencyLimiter {

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { BaseClient } from '../../core/base-client.ts';
+import { BaseClient } from '../../core/base-client';
 import {
   AuthenticationError,
   ListPostsOptions,
@@ -8,8 +8,8 @@ import {
   PlatformPost,
   Post,
   ValidationError
-} from '../../core/types.ts';
-import { DevToArticle, DevToConfig, DevToPost } from './types.ts';
+} from '../../core/types';
+import { DevToArticle, DevToConfig, DevToPost } from './types';
 
 export class DevToClient extends BaseClient implements PlatformClient {
   public readonly name = 'Dev.to';

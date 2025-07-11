@@ -1,5 +1,5 @@
-import { PlatformPost, Post } from '../../core/types.ts';
-import { HashnodeArticle, HashnodePost } from './types.ts';
+import { PlatformPost, Post } from '../../core/types';
+import { HashnodeArticle, HashnodePost } from './types';
 
 /**
  * Transforms data between common Post format and Hashnode-specific formats

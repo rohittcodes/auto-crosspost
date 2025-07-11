@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
-import { AutoCrossPost } from '../auto-crosspost.ts';
-import { Post } from './types.ts';
-import { ConfigManager } from '../config/index.ts';
+import { AutoCrossPost } from '../auto-crosspost';
+import { Post } from './types';
+import { ConfigManager } from '../config/index';
 
 export interface QueueOptions {
   concurrency?: number;

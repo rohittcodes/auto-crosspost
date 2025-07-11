@@ -1,7 +1,7 @@
 import { readdir } from 'fs/promises';
 import * as cron from 'node-cron';
 import { join } from 'path';
-import { BatchOptions, BatchProcessor } from './batch-processor.ts';
+import { BatchOptions, BatchProcessor } from './batch-processor';
 
 export interface SchedulerOptions {
   batchOptions?: BatchOptions;

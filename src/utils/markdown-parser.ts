@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import matter from 'gray-matter';
 import { extname } from 'path';
-import { MarkdownFile, Post } from '../core/types.ts';
+import { MarkdownFile, Post } from '../core/types';
 
 /**
  * Utility class for parsing markdown and MDX files with frontmatter

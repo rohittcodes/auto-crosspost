@@ -1,0 +1,70 @@
+# Source files and development artifacts
+src/
+tests/
+examples/
+docs/
+scripts/
+
+# Configuration and project files
+*.md
+!README.md
+PLANNING.md
+TEST_RES.md
+test.js
+jest.config.json
+tsconfig.json
+.gitignore
+.npmignore
+
+# Development dependencies and tooling
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment and configuration files
+.env*
+.crosspostrc.*
+crosspost.config.*
+
+# Build and compilation artifacts
+*.tsbuildinfo
+*.js.map
+*.d.ts.map
+
+# Testing artifacts
+coverage/
+.nyc_output/
+test-results/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Development server files
+.vitepress/
+node_modules/
+
+# Lock files (optional - you might want to include these)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

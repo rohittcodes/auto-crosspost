@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { Command } from 'commander';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
-import { AutoCrossPost, CrossPostConfig } from '../index.ts';
+import { AutoCrossPost, CrossPostConfig } from '../index';
 
 const program = new Command();
 

@@ -6,10 +6,10 @@ import {
   PlatformClient,
   PlatformPost,
   Post
-} from './core/types.ts';
-import { DevToClient } from './platforms/devto/index.ts';
-import { HashnodeClient } from './platforms/hashnode/index.ts';
-import { MarkdownParser } from './utils/markdown-parser.ts';
+} from './core/types';
+import { DevToClient } from './platforms/devto/index';
+import { HashnodeClient } from './platforms/hashnode/index';
+import { MarkdownParser } from './utils/markdown-parser';
 
 /**
  * Main Auto-CrossPost SDK class

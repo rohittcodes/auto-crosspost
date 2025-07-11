@@ -1,7 +1,7 @@
 import * as chokidar from 'chokidar';
 import { join } from 'path';
-import { MarkdownParser } from '../utils/markdown-parser.ts';
-import { CrossPostQueue, QueueJobData } from './queue.ts';
+import { MarkdownParser } from '../utils/markdown-parser';
+import { CrossPostQueue, QueueJobData } from './queue';
 
 export interface WatcherOptions {
   concurrency?: number;

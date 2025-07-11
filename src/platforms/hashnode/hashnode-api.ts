@@ -4,7 +4,7 @@ import {
   HashnodePost,
   HashnodePublication,
   HashnodeUser
-} from './types.ts';
+} from './types';
 
 /**
  * Low-level API interface for Hashnode GraphQL operations

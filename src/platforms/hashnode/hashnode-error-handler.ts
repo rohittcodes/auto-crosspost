@@ -2,7 +2,7 @@ import {
   AuthenticationError,
   PlatformError,
   ValidationError
-} from '../../core/types.ts';
+} from '../../core/types';
 
 /**
  * Handles Hashnode-specific error transformation and mapping

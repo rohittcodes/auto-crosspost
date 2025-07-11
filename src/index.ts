@@ -1,8 +1,8 @@
 // Main SDK exports
-export { AutoCrossPost } from './auto-crosspost.ts';
+export { AutoCrossPost } from './auto-crosspost';
 
 // Core types and interfaces
-export * from './core/types.ts';
+export * from './core/types';
 
 // Batch processing services
 export {

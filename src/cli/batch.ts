@@ -10,7 +10,7 @@ import {
   CrossPostQueue,
   CrossPostScheduler,
   FileWatcher
-} from '../core/index.ts';
+} from '../core/index';
 
 const program = new Command();
 

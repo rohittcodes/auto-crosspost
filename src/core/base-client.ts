@@ -1,4 +1,4 @@
-import { CrossPostError, ListPostsOptions, PlatformClient, PlatformPost, Post } from './types.ts';
+import { CrossPostError, ListPostsOptions, PlatformClient, PlatformPost, Post } from './types';
 
 /**
  * Abstract base class for platform clients

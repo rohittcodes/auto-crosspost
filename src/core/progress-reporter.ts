@@ -1,4 +1,4 @@
-import { BatchResult } from './batch-processor.ts';
+import { BatchResult } from './batch-processor';
 
 export interface BatchReport {
   totalJobs: number;

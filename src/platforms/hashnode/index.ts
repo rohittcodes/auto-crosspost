@@ -1,6 +1,6 @@
-export { HashnodeApi } from './hashnode-api.ts';
-export { HashnodeClient } from './hashnode-client.ts';
-export { HashnodeErrorHandler } from './hashnode-error-handler.ts';
-export { HashnodeTransformer } from './hashnode-transformer.ts';
-export * from './types.ts';
+export { HashnodeApi } from './hashnode-api';
+export { HashnodeClient } from './hashnode-client';
+export { HashnodeErrorHandler } from './hashnode-error-handler';
+export { HashnodeTransformer } from './hashnode-transformer';
+export * from './types';
 
