@@ -1,0 +1,22 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Rotating outer ring -->
+  <circle cx="24" cy="24" r="20" fill="none" stroke="url(#spinnerGradient)" stroke-width="3" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+    <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416;0 31.416" repeatCount="indefinite"/>
+    <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416;-31.416" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Central document icon -->
+  <g transform="translate(18, 16)">
+    <rect x="0" y="0" width="12" height="16" fill="url(#spinnerGradient)" rx="1.5" opacity="0.8"/>
+    <rect x="2" y="3" width="8" height="1" fill="white" opacity="0.9" rx="0.5"/>
+    <rect x="2" y="6" width="6" height="1" fill="white" opacity="0.7" rx="0.5"/>
+    <rect x="2" y="9" width="7" height="1" fill="white" opacity="0.7" rx="0.5"/>
+  </g>
+</svg>
